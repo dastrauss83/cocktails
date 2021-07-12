@@ -10,28 +10,34 @@ import {
 
 import { useStyles } from "./useStyles";
 
-export const DrinkCard: React.FC = () => {
+type DrinkCardProps = {
+  drink: any;
+};
+
+export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
   const classes = useStyles();
+
+  const ingredientList = [];
+
+  for (let i = 1; i < 15; i++) {
+    if (drink[`strIngredient${i}`]) {
+      ingredientList.push(drink[`strMeasure${i}`] + drink[`strIngredient${i}`]);
+    }
+  }
 
   return (
     <Grid item xs={12} sm={6} md={4}>
       <Card className={classes.card}>
-        <CardMedia
-          className={classes.cardMedia}
-          image="https://source.unsplash.com/random"
-        />
+        <CardMedia className={classes.cardMedia} image={drink.strDrinkThumb} />
         <CardContent className={classes.cardContent}>
           <Typography gutterBottom variant="h5">
-            Drink name
+            {drink.strDrink}
           </Typography>
-          <Typography>
-            Drink descrption. See what the api has to offer
-          </Typography>
-          {/* Maybe map a list of the Ingredients */}
+          {/* <Typography>{drink.strInstructions}</Typography> */}
           <ul className={classes.ingredientList}>
-            <li>Ingredient 1</li>
-            <li>Ingredient 2</li>
-            <li>Ingredient 3</li>
+            {ingredientList.map((ingredient) => (
+              <li>{ingredient}</li>
+            ))}
           </ul>
         </CardContent>
         <CardActions className={classes.cardButtons}>

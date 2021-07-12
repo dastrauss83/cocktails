@@ -4,10 +4,10 @@ import { purple, green } from "@material-ui/core/colors";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: green[500],
+      main: green[600],
     },
     secondary: {
-      main: purple[500],
+      main: purple[800],
     },
   },
 });
@@ -16,6 +16,7 @@ export const useStyles = makeStyles((theme) => ({
   container: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(8, 0, 6),
+    marginTop: "20px",
   },
   icon: {
     marginRight: "20px",
