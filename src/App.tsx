@@ -16,6 +16,7 @@ export const App: React.FC = () => {
   const classes = useStyles();
 
   const [allDrinks, setAllDrinks] = useState<any | undefined>();
+  const [allIngredients, setAllIngredients] = useState<any | undefined>();
 
   const getOneDrinkList = async (key: string) => {
     let response = await fetch(
@@ -35,8 +36,8 @@ export const App: React.FC = () => {
       );
     }
     const arrayOfDrinks = (await Promise.all(listOfPromises)).flat();
-    const listOfDrinks = arrayOfDrinks.filter(Boolean);
-    console.log(listOfDrinks);
+    const listOfDrinks = arrayOfDrinks.filter(Boolean).sort();
+
     setAllDrinks(listOfDrinks);
   };
 
@@ -44,6 +45,49 @@ export const App: React.FC = () => {
     getAllDrinks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getAllIngredients = () => {
+    const ingredientList: any = [];
+    if (allDrinks && allDrinks.length > 430) {
+      for (let j = 0; j < allDrinks.length; j++) {
+        for (let i = 1; i < 15; i++) {
+          if (allDrinks[j][`strIngredient${i}`]) {
+            if (
+              ingredientList.indexOf(
+                allDrinks[j][`strIngredient${i}`]
+                  .toLowerCase()
+                  .split(" ")
+                  .map(
+                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
+                  )
+                  .join(" ")
+              ) === -1
+            ) {
+              ingredientList.push(
+                allDrinks[j][`strIngredient${i}`]
+                  .toLowerCase()
+                  .split(" ")
+                  .map(
+                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
+                  )
+                  .join(" ")
+              );
+            }
+          } else {
+            break;
+          }
+        }
+      }
+    }
+    ingredientList.sort();
+
+    setAllIngredients(ingredientList);
+  };
+
+  useEffect(() => {
+    getAllIngredients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allDrinks, setAllDrinks]);
 
   return (
     <>
@@ -71,7 +115,10 @@ export const App: React.FC = () => {
                 it looks big on the screen. WHen I got to the mall I buy ducks
                 and quacks. I love to play soccer and especially liverpool.
               </Typography>
-              <IngredientInteract allCocktails={allDrinks} />
+              <IngredientInteract
+                allDrinks={allDrinks}
+                allIngredients={allIngredients}
+              />
             </Container>
           </div>
           <Container className={classes.cardGrid} maxWidth="md">

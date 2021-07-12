@@ -21,7 +21,11 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
 
   for (let i = 1; i < 15; i++) {
     if (drink[`strIngredient${i}`]) {
-      ingredientList.push(drink[`strMeasure${i}`] + drink[`strIngredient${i}`]);
+      ingredientList.push(
+        (drink[`strMeasure${i}`] || "") + " " + drink[`strIngredient${i}`] || ""
+      );
+    } else {
+      break;
     }
   }
 
@@ -35,8 +39,8 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
           </Typography>
           {/* <Typography>{drink.strInstructions}</Typography> */}
           <ul className={classes.ingredientList}>
-            {ingredientList.map((ingredient) => (
-              <li>{ingredient}</li>
+            {ingredientList.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
             ))}
           </ul>
         </CardContent>
