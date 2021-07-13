@@ -16,6 +16,7 @@ export const App: React.FC = () => {
   const classes = useStyles();
 
   const [allDrinks, setAllDrinks] = useState<any | undefined>();
+  const [filteredDrinks, setFilteredDrinks] = useState<any | undefined>();
   const [allIngredients, setAllIngredients] = useState<any | undefined>();
 
   const getOneDrinkList = async (key: string) => {
@@ -39,6 +40,7 @@ export const App: React.FC = () => {
     const listOfDrinks = arrayOfDrinks.filter(Boolean).sort();
 
     setAllDrinks(listOfDrinks);
+    setFilteredDrinks(listOfDrinks);
   };
 
   useEffect(() => {
@@ -93,10 +95,10 @@ export const App: React.FC = () => {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <NavBar />
+        <NavBar setFilteredDrinks={setFilteredDrinks} allDrinks={allDrinks} />
         <main>
           <div className={classes.container}>
-            <Container maxWidth="sm">
+            <Container maxWidth="md">
               <Typography
                 variant="h2"
                 align="center"
@@ -111,20 +113,26 @@ export const App: React.FC = () => {
                 color="textSecondary"
                 paragraph
               >
-                This is a real long sentence and I am just typing words so that
-                it looks big on the screen. WHen I got to the mall I buy ducks
-                and quacks. I love to play soccer and especially liverpool.
+                Below is a list of cocktails and their ingredients. You can
+                search the list for a specific cocktail, or use the ingredient
+                searches for a more refined search. The "Drinks With..." search
+                will tell you all the cocktails that include your selected
+                ingredits, while the "My Ingredients" search will show you only
+                the cocktails you can make with the ingredients you have. Click
+                "View" on a cocktail to see any further instructions or
+                "Favorite" to add to the list of your favorite cocktails.
               </Typography>
               <IngredientInteract
                 allDrinks={allDrinks}
                 allIngredients={allIngredients}
+                setFilteredDrinks={setFilteredDrinks}
               />
             </Container>
           </div>
           <Container className={classes.cardGrid} maxWidth="md">
             <Grid container spacing={4}>
-              {allDrinks
-                ? allDrinks.map((drink: any) => (
+              {filteredDrinks
+                ? filteredDrinks.map((drink: any) => (
                     <DrinkCard key={drink.idDrink} drink={drink} />
                   ))
                 : null}

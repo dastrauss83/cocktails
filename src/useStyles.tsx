@@ -19,7 +19,8 @@ export const useStyles = makeStyles((theme) => ({
     marginTop: "20px",
   },
   icon: {
-    marginRight: "20px",
+    marginRight: "15px",
+    marginLeft: "15px",
   },
   buttons: {
     marginTop: "40px",
