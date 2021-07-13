@@ -24,8 +24,8 @@ export const NavBar: React.FC<NavBarProps> = ({
                 setFilteredDrinks(allDrinks);
               }}
             >
-              <LocalBar className={classes.icon} color="secondary" />
-              <Typography variant="h6" color="secondary">
+              <LocalBar className={`${classes.icon} ${classes.navBar}`} />
+              <Typography variant="h6" className={classes.navBar}>
                 Find Your Drink
               </Typography>
             </Button>
@@ -34,10 +34,12 @@ export const NavBar: React.FC<NavBarProps> = ({
             <Button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
-              <Typography variant="h6" color="secondary">
+              <Typography variant="h6" className={classes.navBar}>
                 Sign In
               </Typography>
-              <AccountCircleSharp className={classes.icon} color="secondary" />
+              <AccountCircleSharp
+                className={`${classes.icon} ${classes.navBar}`}
+              />
             </Button>
           </Grid>
         </Grid>

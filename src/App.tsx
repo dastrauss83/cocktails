@@ -18,6 +18,7 @@ export const App: React.FC = () => {
   const [allDrinks, setAllDrinks] = useState<any | undefined>();
   const [filteredDrinks, setFilteredDrinks] = useState<any | undefined>();
   const [allIngredients, setAllIngredients] = useState<any | undefined>();
+  const [ingredientDrinkMap, setIngredientDrinkMap] = useState({});
 
   const getOneDrinkList = async (key: string) => {
     let response = await fetch(
@@ -49,6 +50,7 @@ export const App: React.FC = () => {
   }, []);
 
   const getAllIngredients = () => {
+    const tempIngredientDrinkMap: any = {};
     const ingredientList: any = [];
     if (allDrinks && allDrinks.length > 430) {
       for (let j = 0; j < allDrinks.length; j++) {
@@ -65,6 +67,15 @@ export const App: React.FC = () => {
                   .join(" ")
               ) === -1
             ) {
+              tempIngredientDrinkMap[
+                allDrinks[j][`strIngredient${i}`]
+                  .toLowerCase()
+                  .split(" ")
+                  .map(
+                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
+                  )
+                  .join(" ")
+              ] = [allDrinks[j]];
               ingredientList.push(
                 allDrinks[j][`strIngredient${i}`]
                   .toLowerCase()
@@ -74,6 +85,16 @@ export const App: React.FC = () => {
                   )
                   .join(" ")
               );
+            } else {
+              tempIngredientDrinkMap[
+                allDrinks[j][`strIngredient${i}`]
+                  .toLowerCase()
+                  .split(" ")
+                  .map(
+                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
+                  )
+                  .join(" ")
+              ].push(allDrinks[j]);
             }
           } else {
             break;
@@ -83,6 +104,7 @@ export const App: React.FC = () => {
     }
     ingredientList.sort();
 
+    setIngredientDrinkMap(tempIngredientDrinkMap);
     setAllIngredients(ingredientList);
   };
 
@@ -126,6 +148,7 @@ export const App: React.FC = () => {
                 allDrinks={allDrinks}
                 allIngredients={allIngredients}
                 setFilteredDrinks={setFilteredDrinks}
+                ingredientDrinkMap={ingredientDrinkMap}
               />
             </Container>
           </div>
@@ -139,7 +162,7 @@ export const App: React.FC = () => {
             </Grid>
           </Container>
         </main>
-        <Footer />
+        <Footer setFilteredDrinks={setFilteredDrinks} allDrinks={allDrinks} />
       </ThemeProvider>
     </>
   );

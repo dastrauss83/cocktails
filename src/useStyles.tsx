@@ -4,10 +4,11 @@ import { purple, green } from "@material-ui/core/colors";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: green[600],
+      main: green[800],
     },
     secondary: {
       main: purple[800],
+      light: purple[300],
     },
   },
 });
@@ -51,5 +52,8 @@ export const useStyles = makeStyles((theme) => ({
   cardButtons: {
     display: "flex",
     justifyContent: "space-between",
+  },
+  navBar: {
+    color: "white",
   },
 }));

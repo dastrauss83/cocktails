@@ -1,22 +1,63 @@
 import { useStyles } from "./useStyles";
-import { Typography } from "@material-ui/core";
+import { Button, Grid, Typography } from "@material-ui/core";
+import { LocalBar } from "@material-ui/icons";
 
-export const Footer: React.FC = () => {
+type FooterProps = {
+  setFilteredDrinks: any;
+  allDrinks: any;
+};
+
+export const Footer: React.FC<FooterProps> = ({
+  setFilteredDrinks,
+  allDrinks,
+}) => {
   const classes = useStyles();
 
   return (
     <footer className={classes.footer}>
-      <Typography variant="h6" align="center" gutterBottom>
-        Footer
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        align="center"
-        color="textSecondary"
-        gutterBottom
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        direction="column"
       >
-        Something here for the footer to make sense
-      </Typography>
+        <Grid item>
+          <Button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setFilteredDrinks(allDrinks);
+            }}
+            style={{ paddingLeft: "0px" }}
+          >
+            <LocalBar className={classes.icon} color="secondary" />
+            <Typography variant="h6" color="textPrimary">
+              Find Your Drink
+            </Typography>
+          </Button>
+        </Grid>
+        <Grid item>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            color="textSecondary"
+            gutterBottom
+          >
+            Created by:{" "}
+            <span style={{ fontStyle: "italic" }}>David Strauss</span>
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            color="textSecondary"
+            gutterBottom
+          >
+            Drinks provided by{" "}
+            <a href="https://thecocktaildb.com/"> thecocktaildb.com</a>
+          </Typography>
+        </Grid>
+      </Grid>
     </footer>
   );
 };
