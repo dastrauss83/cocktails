@@ -37,7 +37,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
   const [interactState, setInteractState] = useState<IneractState>("");
   const [myIngredientsState, setMyIngredientsState] = useState<boolean>(false);
 
-  const handleSearch = (newValue: any) => {
+  const handleSearch = (event: any, newValue: any) => {
     if (newValue.length === 0) {
       setFilteredDrinks(allDrinks);
       return;
@@ -78,10 +78,14 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
       for (let i = 0; i < newValue.length; i++) {
         arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
       }
-      arrayOfDrinks = arrayOfDrinks.filter(
-        (drink: any, index: number, array: Array<any>) =>
-          array.indexOf(drink) === index && array.lastIndexOf(drink) !== index
-      );
+      if (newValue.length === 1) {
+        setFilteredDrinks(newValue);
+      } else {
+        arrayOfDrinks = arrayOfDrinks.filter(
+          (drink: any, index: number, array: Array<any>) =>
+            array.indexOf(drink) === index && array.lastIndexOf(drink) !== index
+        );
+      }
       console.log(arrayOfDrinks);
       setFilteredDrinks(arrayOfDrinks);
     } else {
@@ -90,7 +94,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
         for (let j = 1; j < 15; j++) {
           if (allDrinks[i][`strIngredient${j}`]) {
             if (
-              newValue.indexof(
+              newValue.indexOf(
                 allDrinks[i][`strIngredient${j}`]
                   .toLowerCase()
                   .split(" ")
@@ -103,11 +107,15 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               break;
             }
           } else {
-            arrayOfDrinks.concat(allDrinks[i]);
-            continue;
+            arrayOfDrinks = arrayOfDrinks.concat(allDrinks[i]);
           }
         }
       }
+      arrayOfDrinks = arrayOfDrinks.filter((item: any, pos: any) => {
+        return arrayOfDrinks.indexOf(item) === pos;
+      });
+      console.log(arrayOfDrinks);
+      setFilteredDrinks(arrayOfDrinks);
     }
   };
 
@@ -234,7 +242,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                 <Autocomplete
                   multiple
                   disableCloseOnSelect
-                  onChange={() => handleMyIngredients}
+                  onChange={handleMyIngredients}
                   id="ingredientList"
                   options={allIngredients}
                   getOptionLabel={(option) => JSON.stringify(option)}

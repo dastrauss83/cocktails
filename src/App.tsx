@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
-
 import { ThemeProvider } from "@material-ui/styles";
-
 import { useStyles, theme } from "./useStyles";
-
 import { DrinkCard } from "./DrinkCard";
 import { Footer } from "./Footer";
 import { NavBar } from "./NavBar";
 import { IngredientInteract } from "./IngredientInteract";
 
+firebase.initializeApp({
+  apiKey: "AIzaSyAZCEan1zGJg6N4RyCoI8l36kVYbm8l1F4",
+  authDomain: "cocktails-52bb7.firebaseapp.com",
+  projectId: "cocktails-52bb7",
+  storageBucket: "cocktails-52bb7.appspot.com",
+  messagingSenderId: "315490639182",
+  appId: "1:315490639182:web:78aa99a8cbccfa0a63521f",
+});
+
 export const App: React.FC = () => {
   const classes = useStyles();
+
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const [allDrinks, setAllDrinks] = useState<any | undefined>();
   const [filteredDrinks, setFilteredDrinks] = useState<any | undefined>();
@@ -117,7 +128,12 @@ export const App: React.FC = () => {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <NavBar setFilteredDrinks={setFilteredDrinks} allDrinks={allDrinks} />
+        <NavBar
+          setFilteredDrinks={setFilteredDrinks}
+          allDrinks={allDrinks}
+          currentUser={currentUser}
+          setCurrentUser={setCurrentUser}
+        />
         <main>
           <div className={classes.container}>
             <Container maxWidth="md">
