@@ -231,6 +231,7 @@ export const App: React.FC = () => {
                 allIngredients={allIngredients}
                 setFilteredDrinks={setFilteredDrinks}
                 ingredientDrinkMap={ingredientDrinkMap}
+                currentUser={currentUser}
               />
             </Container>
           </div>

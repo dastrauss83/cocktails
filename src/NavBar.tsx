@@ -123,7 +123,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                   <MenuItem onClick={handleFavoritesScreen}>
                     My Favorites
                   </MenuItem>
-                  <MenuItem onClick={handleCloseMenu}>My Ingredients</MenuItem>
+                  {/* <MenuItem onClick={handleCloseMenu}>My Ingredients</MenuItem> */}
                   <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
               </>

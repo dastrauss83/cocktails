@@ -148,7 +148,7 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
               vertical: "center",
             }}
             elevation={20}
-            PaperProps={{ style: { width: "70%" } }}
+            PaperProps={{ style: { width: "50%" } }}
             classes={{
               root: classes.popover,
             }}

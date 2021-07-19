@@ -1,21 +1,19 @@
 import { createTheme, makeStyles } from "@material-ui/core";
-import { purple, green } from "@material-ui/core/colors";
+import { blue } from "@material-ui/core/colors";
 
 export const theme = createTheme({
   palette: {
     primary: {
-      main: green[800],
+      main: blue[600],
     },
     secondary: {
-      main: purple[800],
-      light: purple[300],
+      main: blue[900],
     },
   },
 });
 
 export const useStyles = makeStyles((theme) => ({
   container: {
-    backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(8, 0, 6),
     marginTop: "20px",
   },
@@ -41,7 +39,6 @@ export const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   footer: {
-    backgroundColor: theme.palette.background.paper,
     padding: "50px 0",
   },
   ingredientList: {
