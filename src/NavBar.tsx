@@ -28,6 +28,19 @@ export const NavBar: React.FC<NavBarProps> = ({
 }) => {
   const classes = useStyles();
 
+  const getCurrentUserData = async () => {
+    let firebaseUser: any;
+    if (currentUser) {
+      firebaseUser = firebase
+        .firestore()
+        .collection("favorites")
+        .doc(currentUser.uid);
+    }
+    const request = await firebaseUser.get();
+    const data = await request.data();
+    return data;
+  };
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,27 +61,15 @@ export const NavBar: React.FC<NavBarProps> = ({
       });
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     if (window.confirm("Are you sure you want to Sign Out?")) {
       setCurrentUser();
     }
   };
 
-  const logFavorites = async () => {
-    const request = await firebase
-      .firestore()
-      .collection("favorites")
-      .doc(currentUser.uid)
-      .get();
-
-    const data = await request.data();
-
-    let favorites;
-    if (data) {
-      favorites = data["favoriteDrinks"];
-    }
-
-    console.log(favorites);
+  const handleFavoritesScreen = async () => {
+    const userData = await getCurrentUserData();
+    setFilteredDrinks(userData.favoriteDrinks);
   };
 
   return (
@@ -119,7 +120,9 @@ export const NavBar: React.FC<NavBarProps> = ({
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
                 >
-                  <MenuItem onClick={logFavorites}>My Favorites</MenuItem>
+                  <MenuItem onClick={handleFavoritesScreen}>
+                    My Favorites
+                  </MenuItem>
                   <MenuItem onClick={handleCloseMenu}>My Ingredients</MenuItem>
                   <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>

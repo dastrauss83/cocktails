@@ -4,7 +4,13 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 // import { useCollectionData } from "react-firebase-hooks/firestore";
-import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
+import {
+  Typography,
+  CssBaseline,
+  Grid,
+  Container,
+  CircularProgress,
+} from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { useStyles, theme } from "./useStyles";
 import { DrinkCard } from "./DrinkCard";
@@ -140,42 +146,43 @@ export const App: React.FC = () => {
           <CssBaseline />
           <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
           <main>
-            <div className={classes.container}>
-              <Container maxWidth="md">
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  Find Your Drink
-                </Typography>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="textSecondary"
-                  paragraph
-                >
-                  Below is a list of cocktails and their ingredients. You can
-                  search the list for a specific cocktail, or use the ingredient
-                  searches for a more refined search. The "Drinks With..."
-                  search will tell you all the cocktails that include your
-                  selected ingredits, while the "My Ingredients" search will
-                  show you only the cocktails you can make with the ingredients
-                  you have. Click "View" on a cocktail to see any further
-                  instructions or "Favorite" to add to the list of your favorite
-                  cocktails.
-                </Typography>
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  Loading Drinks...
-                </Typography>
-              </Container>
-            </div>
+            <Container maxWidth="md" className={classes.container}>
+              <Typography
+                variant="h2"
+                align="center"
+                color="textPrimary"
+                gutterBottom
+              >
+                Find Your Drink
+              </Typography>
+              <Typography
+                variant="h5"
+                align="center"
+                color="textSecondary"
+                paragraph
+              >
+                Below is a list of cocktails and their ingredients. You can
+                search the list for a specific cocktail, or use the ingredient
+                searches for a more refined search. The "Drinks With..." search
+                will tell you all the cocktails that include your selected
+                ingredits, while the "My Ingredients" search will show you only
+                the cocktails you can make with the ingredients you have. Click
+                "View" on a cocktail to see any further instructions or
+                "Favorite" to add to the list of your favorite cocktails.
+              </Typography>
+              <Typography
+                style={{ fontStyle: "italic" }}
+                variant="h2"
+                align="center"
+                color="textPrimary"
+                gutterBottom
+              >
+                Loading Drinks
+              </Typography>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress color="secondary" />
+              </div>
+            </Container>
           </main>
           <Footer />
         </ThemeProvider>

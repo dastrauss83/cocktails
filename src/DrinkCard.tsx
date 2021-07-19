@@ -8,6 +8,7 @@ import {
   Button,
 } from "@material-ui/core";
 import firebase from "firebase";
+import { useState } from "react";
 import { useEffect } from "react";
 import { drink } from "./App";
 
@@ -25,6 +26,7 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
   setCurrentUser,
 }) => {
   const classes = useStyles();
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   const ingredientList = [];
 
@@ -49,10 +51,30 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
   }
 
   const getCurrentUserData = async () => {
-    const request = await firebaseUser.get();
-    const data = await request.data();
-    return data;
+    if (currentUser!) {
+      const request = await firebaseUser.get();
+      const data = await request.data();
+      return data;
+    }
   };
+
+  const handleIsFavorite = async () => {
+    if (currentUser) {
+      const userData = await getCurrentUserData();
+      setIsFavorite(
+        userData.favoriteDrinks.filter(
+          (dr: drink) => dr.idDrink === drink.idDrink
+        ).length > 0
+      );
+    } else {
+      setIsFavorite(false);
+    }
+  };
+
+  useEffect(() => {
+    handleIsFavorite();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, setCurrentUser]);
 
   const handleNewUser = async () => {
     if (currentUser) {
@@ -73,14 +95,11 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
 
   const handleFavorite = async () => {
     const userData = await getCurrentUserData();
-    console.log(userData);
-    console.log(drink);
     if (
       userData.favoriteDrinks.filter(
         (dr: drink) => dr.idDrink === drink.idDrink
       ).length > 0
     ) {
-      console.log("work");
       const index = userData.favoriteDrinks.indexOf(drink);
       const tempFavoriteDrinks = [...userData.favoriteDrinks];
       tempFavoriteDrinks.splice(index, 1);
@@ -114,11 +133,30 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
           <Button color="secondary" size="small">
             View
           </Button>
-          {currentUser ? (
-            <Button color="secondary" size="small" onClick={handleFavorite}>
+          {!currentUser ? null : isFavorite ? (
+            <Button
+              color="secondary"
+              variant="contained"
+              size="small"
+              onClick={() => {
+                handleFavorite();
+                setIsFavorite(!isFavorite);
+              }}
+            >
               Favorite
             </Button>
-          ) : null}
+          ) : (
+            <Button
+              color="secondary"
+              size="small"
+              onClick={() => {
+                handleFavorite();
+                setIsFavorite(!isFavorite);
+              }}
+            >
+              Favorite
+            </Button>
+          )}
         </CardActions>
       </Card>
     </Grid>

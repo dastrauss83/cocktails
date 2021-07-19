@@ -89,7 +89,6 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               array.lastIndexOf(drink) !== index
           );
         }
-        console.log(arrayOfDrinks);
         setFilteredDrinks(arrayOfDrinks);
       } else {
         //strict
@@ -117,7 +116,6 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
         arrayOfDrinks = arrayOfDrinks.filter((drink: drink, index: number) => {
           return arrayOfDrinks.indexOf(drink) === index;
         });
-        console.log(arrayOfDrinks);
         setFilteredDrinks(arrayOfDrinks);
       }
     }
