@@ -6,6 +6,7 @@ import {
   CardMedia,
   Grid,
   Button,
+  Popover,
 } from "@material-ui/core";
 import firebase from "firebase";
 import { useState } from "react";
@@ -27,6 +28,7 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
 }) => {
   const classes = useStyles();
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isInView, setIsInView] = useState<boolean>(false);
 
   const ingredientList = [];
 
@@ -130,9 +132,51 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
           </ul>
         </CardContent>
         <CardActions className={classes.cardButtons}>
-          <Button color="secondary" size="small">
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => setIsInView(true)}
+          >
             View
           </Button>
+          <Popover
+            open={isInView}
+            anchorReference="none"
+            onClose={() => setIsInView(!isInView)}
+            transformOrigin={{
+              horizontal: "center",
+              vertical: "center",
+            }}
+            elevation={20}
+            PaperProps={{ style: { width: "70%" } }}
+            classes={{
+              root: classes.popover,
+            }}
+          >
+            <Card className={classes.card}>
+              <CardMedia
+                className={classes.cardMedia}
+                image={drink.strDrinkThumb}
+              />
+              <CardContent className={classes.cardContent}>
+                <Typography gutterBottom variant="h2">
+                  {drink.strDrink}
+                </Typography>
+                <Typography gutterBottom variant="h5">
+                  {drink.strInstructions}
+                </Typography>
+                <ul className={classes.ingredientList}>
+                  {ingredientList.map((ingredient, index) => (
+                    <li key={index}>
+                      <Typography gutterBottom variant="h5">
+                        {ingredient}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </Popover>
           {!currentUser ? null : isFavorite ? (
             <Button
               color="secondary"

@@ -56,4 +56,9 @@ export const useStyles = makeStyles((theme) => ({
   navBar: {
     color: "white",
   },
+  popover: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 }));
