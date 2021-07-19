@@ -3,7 +3,7 @@ import "./App.css";
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+// import { useCollectionData } from "react-firebase-hooks/firestore";
 import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { useStyles, theme } from "./useStyles";
@@ -172,7 +172,11 @@ export const App: React.FC = () => {
             <Grid container spacing={4}>
               {filteredDrinks
                 ? filteredDrinks.map((drink: any) => (
-                    <DrinkCard key={drink.idDrink} drink={drink} />
+                    <DrinkCard
+                      key={drink.idDrink}
+                      drink={drink}
+                      currentUser={currentUser}
+                    />
                   ))
                 : null}
             </Grid>

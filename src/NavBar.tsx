@@ -37,7 +37,7 @@ export const NavBar: React.FC<NavBarProps> = ({
     setAnchorEl(null);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase
       .auth()
@@ -48,7 +48,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   };
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to Log Out?")) {
+    if (window.confirm("Are you sure you want to Sign Out?")) {
       setCurrentUser();
     }
   };

@@ -7,14 +7,16 @@ import {
   Grid,
   Button,
 } from "@material-ui/core";
+import firebase from "firebase";
 
 import { useStyles } from "./useStyles";
 
 type DrinkCardProps = {
   drink: any;
+  currentUser: any;
 };
 
-export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
+export const DrinkCard: React.FC<DrinkCardProps> = ({ drink, currentUser }) => {
   const classes = useStyles();
 
   const ingredientList = [];
@@ -28,6 +30,24 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
       break;
     }
   }
+
+  const handleFavorite = async (drink: any) => {
+    const currentUserFavorites = [
+      await firebase
+        .firestore()
+        .collection("favorites")
+        .doc(currentUser.uid)
+        .get(),
+    ];
+
+    await firebase
+      .firestore()
+      .collection("favorites")
+      .doc(currentUser.uid)
+      .set({
+        favoriteDrinks: [...currentUserFavorites, drink],
+      });
+  };
 
   return (
     <Grid item xs={12} sm={6} md={4}>
@@ -48,7 +68,13 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
           <Button color="secondary" size="small">
             View
           </Button>
-          <Button color="secondary" size="small">
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => {
+              handleFavorite(drink);
+            }}
+          >
             Favorite
           </Button>
         </CardActions>
