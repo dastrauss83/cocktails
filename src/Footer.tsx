@@ -1,10 +1,11 @@
 import { useStyles } from "./useStyles";
 import { Button, Grid, Typography } from "@material-ui/core";
 import { LocalBar } from "@material-ui/icons";
+import { drink } from "./App";
 
 type FooterProps = {
-  setFilteredDrinks: any;
-  allDrinks: any;
+  setFilteredDrinks?: any;
+  allDrinks?: drink[];
 };
 
 export const Footer: React.FC<FooterProps> = ({

@@ -21,15 +21,24 @@ firebase.initializeApp({
   appId: "1:315490639182:web:78aa99a8cbccfa0a63521f",
 });
 
+export type drink = {
+  [key: string]: string;
+};
+
+export type ingredientDrinkMap = {
+  [key: string]: drink[];
+};
+
 export const App: React.FC = () => {
   const classes = useStyles();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  const [allDrinks, setAllDrinks] = useState<any | undefined>();
-  const [filteredDrinks, setFilteredDrinks] = useState<any | undefined>();
-  const [allIngredients, setAllIngredients] = useState<any | undefined>();
-  const [ingredientDrinkMap, setIngredientDrinkMap] = useState({});
+  const [allDrinks, setAllDrinks] = useState<drink[]>();
+  const [filteredDrinks, setFilteredDrinks] = useState<drink[]>();
+  const [allIngredients, setAllIngredients] = useState<string[]>();
+  const [ingredientDrinkMap, setIngredientDrinkMap] =
+    useState<ingredientDrinkMap>({});
 
   const getOneDrinkList = async (key: string) => {
     let response = await fetch(
@@ -42,7 +51,7 @@ export const App: React.FC = () => {
 
   const getAllDrinks = async () => {
     const possibleKeys = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let listOfPromises: any = [];
+    let listOfPromises: Promise<any>[] = [];
     for (let i = 0; i < possibleKeys.length; i++) {
       listOfPromises = await listOfPromises.concat(
         getOneDrinkList(possibleKeys.charAt(i))
@@ -61,8 +70,8 @@ export const App: React.FC = () => {
   }, []);
 
   const getAllIngredients = () => {
-    const tempIngredientDrinkMap: any = {};
-    const ingredientList: any = [];
+    const tempIngredientDrinkMap: ingredientDrinkMap = {};
+    const ingredientList: string[] = [];
     if (allDrinks && allDrinks.length > 430) {
       for (let j = 0; j < allDrinks.length; j++) {
         for (let i = 1; i < 15; i++) {
@@ -124,6 +133,56 @@ export const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allDrinks, setAllDrinks]);
 
+  if (!(allDrinks && allIngredients)) {
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
+          <main>
+            <div className={classes.container}>
+              <Container maxWidth="md">
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  Find Your Drink
+                </Typography>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="textSecondary"
+                  paragraph
+                >
+                  Below is a list of cocktails and their ingredients. You can
+                  search the list for a specific cocktail, or use the ingredient
+                  searches for a more refined search. The "Drinks With..."
+                  search will tell you all the cocktails that include your
+                  selected ingredits, while the "My Ingredients" search will
+                  show you only the cocktails you can make with the ingredients
+                  you have. Click "View" on a cocktail to see any further
+                  instructions or "Favorite" to add to the list of your favorite
+                  cocktails.
+                </Typography>
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  Loading Drinks...
+                </Typography>
+              </Container>
+            </div>
+          </main>
+          <Footer />
+        </ThemeProvider>
+      </>
+    );
+  }
+
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -171,11 +230,12 @@ export const App: React.FC = () => {
           <Container className={classes.cardGrid} maxWidth="md">
             <Grid container spacing={4}>
               {filteredDrinks
-                ? filteredDrinks.map((drink: any) => (
+                ? filteredDrinks.map((drink: drink) => (
                     <DrinkCard
                       key={drink.idDrink}
                       drink={drink}
                       currentUser={currentUser}
+                      setCurrentUser={setCurrentUser}
                     />
                   ))
                 : null}

@@ -16,14 +16,15 @@ import { useState } from "react";
 
 import { useStyles } from "./useStyles";
 import React from "react";
+import { drink, ingredientDrinkMap } from "./App";
 
 type IneractState = "" | "search" | "drinksWith" | "myIngredients";
 
 type IngredientInteractProps = {
-  allDrinks: any;
-  allIngredients: any;
+  allDrinks: drink[];
+  allIngredients: string[];
   setFilteredDrinks: any;
-  ingredientDrinkMap: any;
+  ingredientDrinkMap: ingredientDrinkMap;
 };
 
 export const IngredientInteract: React.FC<IngredientInteractProps> = ({
@@ -37,7 +38,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
   const [interactState, setInteractState] = useState<IneractState>("");
   const [myIngredientsState, setMyIngredientsState] = useState<boolean>(false);
 
-  const handleSearch = (event: any, newValue: any) => {
+  const handleSearch = (event: any, newValue: drink | drink[]) => {
     if (newValue.length === 0) {
       setFilteredDrinks(allDrinks);
       return;
@@ -49,7 +50,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
     }
   };
 
-  const handleDrinksWith = (event: any, newValue: any) => {
+  const handleDrinksWith = (event: any, newValue: string | string[]) => {
     if (newValue.length === 0) {
       setFilteredDrinks(allDrinks);
       return;
@@ -57,65 +58,68 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
     if (!Array.isArray(newValue)) {
       newValue = [newValue];
     }
-    let arrayOfDrinks: any = [];
+    let arrayOfDrinks: drink[] = [];
     for (let i = 0; i < newValue.length; i++) {
       arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
     }
     setFilteredDrinks(arrayOfDrinks);
   };
 
-  const handleMyIngredients = (event: any, newValue: any) => {
-    if (newValue.length === 0) {
-      setFilteredDrinks(allDrinks);
-      return;
-    }
-    if (!Array.isArray(newValue)) {
-      newValue = [newValue];
-    }
-    let arrayOfDrinks: any = [];
-    if (!myIngredientsState) {
-      //not strict
-      for (let i = 0; i < newValue.length; i++) {
-        arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
+  const handleMyIngredients = (event: any, newValue: string | string[]) => {
+    if (allDrinks) {
+      if (newValue.length === 0) {
+        setFilteredDrinks(allDrinks);
+        return;
       }
-      if (newValue.length === 1) {
-        setFilteredDrinks(newValue);
+      if (!Array.isArray(newValue)) {
+        newValue = [newValue];
+      }
+      let arrayOfDrinks: drink[] = [];
+      if (!myIngredientsState) {
+        //not strict
+        for (let i = 0; i < newValue.length; i++) {
+          arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
+        }
+        if (newValue.length === 1) {
+          setFilteredDrinks(newValue);
+        } else {
+          arrayOfDrinks = arrayOfDrinks.filter(
+            (drink: drink, index: number, array: drink[]) =>
+              array.indexOf(drink) === index &&
+              array.lastIndexOf(drink) !== index
+          );
+        }
+        console.log(arrayOfDrinks);
+        setFilteredDrinks(arrayOfDrinks);
       } else {
-        arrayOfDrinks = arrayOfDrinks.filter(
-          (drink: any, index: number, array: Array<any>) =>
-            array.indexOf(drink) === index && array.lastIndexOf(drink) !== index
-        );
-      }
-      console.log(arrayOfDrinks);
-      setFilteredDrinks(arrayOfDrinks);
-    } else {
-      //strict
-      for (let i = 0; i < allDrinks.length; i++) {
-        for (let j = 1; j < 15; j++) {
-          if (allDrinks[i][`strIngredient${j}`]) {
-            if (
-              newValue.indexOf(
-                allDrinks[i][`strIngredient${j}`]
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                  )
-                  .join(" ")
-              ) === -1
-            ) {
-              break;
+        //strict
+        for (let i = 0; i < allDrinks.length; i++) {
+          for (let j = 1; j < 15; j++) {
+            if (allDrinks[i][`strIngredient${j}`]) {
+              if (
+                newValue.indexOf(
+                  allDrinks[i][`strIngredient${j}`]
+                    .toLowerCase()
+                    .split(" ")
+                    .map(
+                      (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
+                    )
+                    .join(" ")
+                ) === -1
+              ) {
+                break;
+              }
+            } else {
+              arrayOfDrinks = arrayOfDrinks.concat(allDrinks[i]);
             }
-          } else {
-            arrayOfDrinks = arrayOfDrinks.concat(allDrinks[i]);
           }
         }
+        arrayOfDrinks = arrayOfDrinks.filter((drink: drink, index: number) => {
+          return arrayOfDrinks.indexOf(drink) === index;
+        });
+        console.log(arrayOfDrinks);
+        setFilteredDrinks(arrayOfDrinks);
       }
-      arrayOfDrinks = arrayOfDrinks.filter((item: any, pos: any) => {
-        return arrayOfDrinks.indexOf(item) === pos;
-      });
-      console.log(arrayOfDrinks);
-      setFilteredDrinks(arrayOfDrinks);
     }
   };
 
@@ -187,7 +191,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               id="cocktailList"
               onChange={handleSearch}
               options={allDrinks}
-              getOptionLabel={(option: any) => option.strDrink}
+              getOptionLabel={(option: drink) => option.strDrink}
               style={{ width: 300 }}
               renderInput={(params) => (
                 <TextField {...params} label="Cocktails" variant="outlined" />

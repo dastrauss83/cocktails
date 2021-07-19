@@ -11,10 +11,11 @@ import {
 import { useStyles } from "./useStyles";
 import firebase from "firebase";
 import { useState } from "react";
+import { drink } from "./App";
 
 type NavBarProps = {
-  setFilteredDrinks: any;
-  allDrinks: any;
+  setFilteredDrinks?: any;
+  allDrinks?: drink[];
   currentUser: any;
   setCurrentUser: any;
 };
@@ -51,6 +52,23 @@ export const NavBar: React.FC<NavBarProps> = ({
     if (window.confirm("Are you sure you want to Sign Out?")) {
       setCurrentUser();
     }
+  };
+
+  const logFavorites = async () => {
+    const request = await firebase
+      .firestore()
+      .collection("favorites")
+      .doc(currentUser.uid)
+      .get();
+
+    const data = await request.data();
+
+    let favorites;
+    if (data) {
+      favorites = data["favoriteDrinks"];
+    }
+
+    console.log(favorites);
   };
 
   return (
@@ -101,7 +119,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
                 >
-                  <MenuItem onClick={handleCloseMenu}>My Favorites</MenuItem>
+                  <MenuItem onClick={logFavorites}>My Favorites</MenuItem>
                   <MenuItem onClick={handleCloseMenu}>My Ingredients</MenuItem>
                   <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
