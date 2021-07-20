@@ -13,7 +13,6 @@ import { Search } from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { useState } from "react";
-
 import { useStyles } from "./useStyles";
 import React from "react";
 import { drink, ingredientDrinkMap } from "./App";
@@ -243,57 +242,45 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               wrap="wrap"
             >
               <Grid item>
-                <Grid container justifyContent="center" alignItems="center">
-                  <Grid item>
-                    <Autocomplete
-                      multiple
-                      disableCloseOnSelect
-                      onChange={handleMyIngredients}
-                      id="ingredientList"
-                      options={allIngredients}
-                      getOptionLabel={(option) => JSON.stringify(option)}
-                      renderOption={(option, { selected }) => (
-                        <React.Fragment>
-                          <Checkbox
-                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                            checkedIcon={<CheckBoxIcon fontSize="small" />}
-                            style={{ marginRight: 8 }}
-                            checked={selected}
-                          />
-                          {option}
-                        </React.Fragment>
-                      )}
-                      style={{ width: 300 }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Ingredients"
-                          variant="outlined"
-                        />
-                      )}
+                <Autocomplete
+                  multiple
+                  disableCloseOnSelect
+                  onChange={handleMyIngredients}
+                  id="ingredientList"
+                  options={allIngredients}
+                  getOptionLabel={(option) => JSON.stringify(option)}
+                  renderOption={(option, { selected }) => (
+                    <React.Fragment>
+                      <Checkbox
+                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                        checkedIcon={<CheckBoxIcon fontSize="small" />}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                      />
+                      {option}
+                    </React.Fragment>
+                  )}
+                  style={{ width: 300 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Ingredients"
+                      variant="outlined"
                     />
-                  </Grid>
-                  {currentUser ? (
-                    <Grid
-                      item
-                      style={{
-                        display: "flex",
-                        position: "absolute",
-                        top: "0",
-                        right: "0",
-                      }}
-                    >
-                      <Button
-                        variant="text"
-                        color="secondary"
-                        onClick={() => setFilteredDrinks(allDrinks)}
-                      >
-                        Add My Saved Ingredients
-                      </Button>
-                    </Grid>
-                  ) : null}
-                </Grid>
+                  )}
+                />
               </Grid>
+              {currentUser ? (
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => setFilteredDrinks(allDrinks)}
+                  >
+                    Import My Ingredients
+                  </Button>
+                </Grid>
+              ) : null}
               <Grid item>
                 <FormGroup>
                   <FormControlLabel

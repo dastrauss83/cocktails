@@ -56,4 +56,7 @@ export const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
+  menu: {
+    width: "500px",
+  },
 }));

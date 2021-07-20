@@ -1,4 +1,9 @@
-import { AccountCircleSharp, LocalBar } from "@material-ui/icons";
+import {
+  AccountCircleSharp,
+  FavoriteBorder,
+  InvertColors,
+  LocalBar,
+} from "@material-ui/icons";
 import {
   Typography,
   AppBar,
@@ -93,8 +98,8 @@ export const NavBar: React.FC<NavBarProps> = ({
               </Typography>
             </Button>
           </Grid>
-          <Grid item>
-            {!currentUser ? (
+          {!currentUser ? (
+            <Grid item>
               <Button onClick={() => handleLogin()}>
                 <Typography variant="h6" className={classes.navBar}>
                   Sign In
@@ -103,8 +108,30 @@ export const NavBar: React.FC<NavBarProps> = ({
                   className={`${classes.icon} ${classes.navBar}`}
                 />
               </Button>
-            ) : (
-              <>
+            </Grid>
+          ) : (
+            <>
+              <Grid item>
+                <Button onClick={handleMyFavoritesScreen}>
+                  <FavoriteBorder
+                    className={`${classes.icon} ${classes.navBar}`}
+                  />
+                  <Typography variant="h6" className={classes.navBar}>
+                    My Favorites
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button onClick={() => setScreenState("My Ingredients")}>
+                  <Typography variant="h6" className={classes.navBar}>
+                    My Ingredients
+                  </Typography>
+                  <InvertColors
+                    className={`${classes.icon} ${classes.navBar}`}
+                  />
+                </Button>
+              </Grid>
+              <Grid item>
                 <Button
                   aria-controls="simple-menu"
                   aria-haspopup="true"
@@ -123,18 +150,13 @@ export const NavBar: React.FC<NavBarProps> = ({
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
+                  className={classes.menu}
                 >
-                  <MenuItem onClick={handleMyFavoritesScreen}>
-                    My Favorites
-                  </MenuItem>
-                  <MenuItem onClick={() => setScreenState("My Ingredients")}>
-                    My Ingredients
-                  </MenuItem>
                   <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
-              </>
-            )}
-          </Grid>
+              </Grid>
+            </>
+          )}
         </Grid>
       </Toolbar>
     </AppBar>

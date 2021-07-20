@@ -3,7 +3,6 @@ import "./App.css";
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-// import { useCollectionData } from "react-firebase-hooks/firestore";
 import {
   Typography,
   CssBaseline,
@@ -17,6 +16,7 @@ import { DrinkCard } from "./DrinkCard";
 import { Footer } from "./Footer";
 import { NavBar } from "./NavBar";
 import { IngredientInteract } from "./IngredientInteract";
+import { MyIngredients } from "./MyIngredients";
 
 firebase.initializeApp({
   apiKey: "AIzaSyAZCEan1zGJg6N4RyCoI8l36kVYbm8l1F4",
@@ -44,9 +44,9 @@ export const App: React.FC = () => {
 
   const [screenState, setScreenState] = useState<screenState>("Find My Drink");
 
-  const [allDrinks, setAllDrinks] = useState<drink[]>();
-  const [filteredDrinks, setFilteredDrinks] = useState<drink[]>();
-  const [allIngredients, setAllIngredients] = useState<string[]>();
+  const [allDrinks, setAllDrinks] = useState<drink[]>([]);
+  const [filteredDrinks, setFilteredDrinks] = useState<drink[]>([]);
+  const [allIngredients, setAllIngredients] = useState<string[]>([]);
   const [ingredientDrinkMap, setIngredientDrinkMap] =
     useState<ingredientDrinkMap>({});
 
@@ -288,6 +288,16 @@ export const App: React.FC = () => {
                 >
                   My Favorites
                 </Typography>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="textSecondary"
+                  paragraph
+                >
+                  Below are the cocktails that you have favorited. This list can
+                  be added to and removed from at any time. Use the Find My
+                  Drink screen to add more drinks to My Favorites.
+                </Typography>
               </Container>
             </div>
             <Container className={classes.cardGrid} maxWidth="md">
@@ -348,6 +358,12 @@ export const App: React.FC = () => {
                   My Ingredients can also be imported to the Find My Drink
                   screen for easy use.
                 </Typography>
+                <MyIngredients
+                  allIngredients={allIngredients}
+                  currentUser={currentUser}
+                  screenState={screenState}
+                  setScreenState={setScreenState}
+                />
               </Container>
             </div>
           </main>
