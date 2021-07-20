@@ -80,6 +80,7 @@ export const NavBar: React.FC<NavBarProps> = ({
     const userData = await getCurrentUserData();
     setFilteredDrinks(userData.favoriteDrinks);
     setScreenState("My Favorites");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -125,7 +126,12 @@ export const NavBar: React.FC<NavBarProps> = ({
                 </Button>
               </Grid>
               <Grid item>
-                <Button onClick={() => setScreenState("My Ingredients")}>
+                <Button
+                  onClick={() => {
+                    setScreenState("My Ingredients");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
                   <Typography variant="h6" className={classes.navBar}>
                     My Ingredients
                   </Typography>
