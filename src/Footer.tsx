@@ -7,12 +7,14 @@ type FooterProps = {
   setFilteredDrinks?: any;
   allDrinks?: drink[];
   setScreenState?: any;
+  setInteractState: any;
 };
 
 export const Footer: React.FC<FooterProps> = ({
   setFilteredDrinks,
   allDrinks,
   setScreenState,
+  setInteractState,
 }) => {
   const classes = useStyles();
 
@@ -27,6 +29,7 @@ export const Footer: React.FC<FooterProps> = ({
         <Grid item>
           <Button
             onClick={() => {
+              setInteractState("");
               setScreenState("Find My Drink");
               window.scrollTo({ top: 0, behavior: "smooth" });
               setFilteredDrinks(allDrinks);

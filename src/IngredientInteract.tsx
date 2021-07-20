@@ -12,12 +12,10 @@ import { Autocomplete } from "@material-ui/lab";
 import { Search } from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStyles } from "./useStyles";
 import React from "react";
-import { drink, ingredientDrinkMap } from "./App";
-
-type IneractState = "" | "search" | "drinksWith" | "myIngredients";
+import { drink, ingredientDrinkMap, interactState } from "./App";
 
 type IngredientInteractProps = {
   allDrinks: drink[];
@@ -25,6 +23,9 @@ type IngredientInteractProps = {
   setFilteredDrinks: any;
   ingredientDrinkMap: ingredientDrinkMap;
   currentUser: any;
+  userIngredients: string[];
+  interactState: interactState;
+  setInteractState: any;
 };
 
 export const IngredientInteract: React.FC<IngredientInteractProps> = ({
@@ -33,11 +34,14 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
   setFilteredDrinks,
   ingredientDrinkMap,
   currentUser,
+  userIngredients,
+  interactState,
+  setInteractState,
 }) => {
   const classes = useStyles();
 
-  const [interactState, setInteractState] = useState<IneractState>("");
   const [myIngredientsState, setMyIngredientsState] = useState<boolean>(false);
+  const [myIngredientsValue, setMyIngredientsValue] = useState<string[]>([]);
 
   const handleSearch = (event: any, newValue: drink | drink[]) => {
     if (newValue.length === 0) {
@@ -70,11 +74,13 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
     if (allDrinks) {
       if (newValue.length === 0) {
         setFilteredDrinks(allDrinks);
+        setMyIngredientsValue([]);
         return;
       }
       if (!Array.isArray(newValue)) {
         newValue = [newValue];
       }
+      setMyIngredientsValue(newValue);
       let arrayOfDrinks: drink[] = [];
       if (!myIngredientsState) {
         //not strict
@@ -121,6 +127,11 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
       }
     }
   };
+
+  useEffect(() => {
+    handleMyIngredients(Event, myIngredientsValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myIngredientsState, setMyIngredientsState]);
 
   return (
     <div className={classes.buttons}>
@@ -245,6 +256,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                 <Autocomplete
                   multiple
                   disableCloseOnSelect
+                  value={myIngredientsValue}
                   onChange={handleMyIngredients}
                   id="ingredientList"
                   options={allIngredients}
@@ -275,7 +287,11 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                   <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={() => setFilteredDrinks(allDrinks)}
+                    onClick={(e) => {
+                      setMyIngredientsValue(userIngredients);
+                      handleMyIngredients(e, userIngredients);
+                      console.log(userIngredients);
+                    }}
                   >
                     Import My Ingredients
                   </Button>
@@ -287,9 +303,9 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                     control={
                       <Switch
                         checked={myIngredientsState}
-                        onChange={() =>
-                          setMyIngredientsState(!myIngredientsState)
-                        }
+                        onChange={() => {
+                          setMyIngredientsState(!myIngredientsState);
+                        }}
                       />
                     }
                     label={

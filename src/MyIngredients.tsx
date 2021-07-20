@@ -4,14 +4,14 @@ import { Checkbox, Grid, TextField } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import { useState } from "react";
-import { useEffect } from "react";
 
 type MyIngredientsProps = {
   allIngredients: string[];
   currentUser: any;
   screenState: string;
   setScreenState: any;
+  userIngredients: string[];
+  setUserIngredients: any;
 };
 
 export const MyIngredients: React.FC<MyIngredientsProps> = ({
@@ -19,9 +19,9 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
   currentUser,
   screenState,
   setScreenState,
+  userIngredients,
+  setUserIngredients,
 }) => {
-  const [myIngredients, setMyIngredients] = useState<string[]>([]);
-
   let firebaseUser: any;
   if (currentUser) {
     firebaseUser = firebase
@@ -38,17 +38,6 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     }
   };
 
-  const getUserIngredients = async () => {
-    const response = await firebaseUser.get();
-    const data = response.data();
-    setMyIngredients(data.myIngredients);
-  };
-
-  useEffect(() => {
-    getUserIngredients();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenState, setScreenState]);
-
   const handleIngredient = async (e: any, newValue: string | string[]) => {
     if (!Array.isArray(newValue)) {
       newValue = [newValue];
@@ -60,7 +49,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     });
     const response = await firebaseUser.get();
     const data = response.data();
-    setMyIngredients(data.myIngredients);
+    setUserIngredients(data.myIngredients);
   };
 
   return (
@@ -76,7 +65,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
         <Autocomplete
           multiple
           disableCloseOnSelect
-          value={myIngredients}
+          value={userIngredients}
           onChange={handleIngredient}
           id="ingredientList"
           options={allIngredients}

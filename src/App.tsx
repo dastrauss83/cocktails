@@ -3,13 +3,7 @@ import "./App.css";
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import {
-  Typography,
-  CssBaseline,
-  Grid,
-  Container,
-  CircularProgress,
-} from "@material-ui/core";
+import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { useStyles, theme } from "./useStyles";
 import { DrinkCard } from "./DrinkCard";
@@ -35,14 +29,18 @@ export type ingredientDrinkMap = {
   [key: string]: drink[];
 };
 
+export type interactState = "" | "search" | "drinksWith" | "myIngredients";
+
 type screenState = "Find My Drink" | "My Favorites" | "My Ingredients";
 
 export const App: React.FC = () => {
   const classes = useStyles();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userIngredients, setUserIngredients] = useState<string[]>([]);
 
   const [screenState, setScreenState] = useState<screenState>("Find My Drink");
+  const [interactState, setInteractState] = useState<interactState>("");
 
   const [allDrinks, setAllDrinks] = useState<drink[]>([]);
   const [filteredDrinks, setFilteredDrinks] = useState<drink[]>([]);
@@ -143,58 +141,28 @@ export const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allDrinks, setAllDrinks]);
 
-  if (screenState === "Find My Drink") {
-    if (!(allDrinks && allIngredients)) {
-      return (
-        <>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
-            <main>
-              <Container maxWidth="md" className={classes.container}>
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  Find My Drink
-                </Typography>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="textSecondary"
-                  paragraph
-                >
-                  Below is a list of cocktails and their ingredients. You can
-                  search the list for a specific cocktail, or use the ingredient
-                  searches for a more refined search. The "Drinks With..."
-                  search will tell you all the cocktails that include your
-                  selected ingredits, while the "My Ingredients" search will
-                  show you only the cocktails you can make with the ingredients
-                  you have. Click on a cocktail to see any further instructions
-                  or "Favorite" to add to My Favorites.
-                </Typography>
-                <Typography
-                  style={{ fontStyle: "italic" }}
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  Loading Drinks
-                </Typography>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <CircularProgress color="secondary" />
-                </div>
-              </Container>
-            </main>
-            <Footer />
-          </ThemeProvider>
-        </>
-      );
-    }
+  let firebaseUser: any;
+  if (currentUser) {
+    firebaseUser = firebase
+      .firestore()
+      .collection("favorites")
+      .doc(currentUser.uid);
+  }
 
+  const getUserIngredients = async () => {
+    if (currentUser) {
+      const response = await firebaseUser.get();
+      const data = response.data();
+      setUserIngredients(data.myIngredients);
+    }
+  };
+
+  useEffect(() => {
+    getUserIngredients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenState, setScreenState, currentUser, setCurrentUser]);
+
+  if (screenState === "Find My Drink") {
     return (
       <>
         <ThemeProvider theme={theme}>
@@ -205,6 +173,7 @@ export const App: React.FC = () => {
             currentUser={currentUser}
             setCurrentUser={setCurrentUser}
             setScreenState={setScreenState}
+            setInteractState={setInteractState}
           />
           <main>
             <div className={classes.container}>
@@ -238,6 +207,9 @@ export const App: React.FC = () => {
                   setFilteredDrinks={setFilteredDrinks}
                   ingredientDrinkMap={ingredientDrinkMap}
                   currentUser={currentUser}
+                  userIngredients={userIngredients}
+                  interactState={interactState}
+                  setInteractState={setInteractState}
                 />
               </Container>
             </div>
@@ -260,6 +232,7 @@ export const App: React.FC = () => {
             setScreenState={setScreenState}
             setFilteredDrinks={setFilteredDrinks}
             allDrinks={allDrinks}
+            setInteractState={setInteractState}
           />
         </ThemeProvider>
       </>
@@ -276,6 +249,7 @@ export const App: React.FC = () => {
             currentUser={currentUser}
             setCurrentUser={setCurrentUser}
             setScreenState={setScreenState}
+            setInteractState={setInteractState}
           />
           <main>
             <div className={classes.container}>
@@ -319,6 +293,7 @@ export const App: React.FC = () => {
             setFilteredDrinks={setFilteredDrinks}
             allDrinks={allDrinks}
             setScreenState={setScreenState}
+            setInteractState={setInteractState}
           />
         </ThemeProvider>
       </>
@@ -335,6 +310,7 @@ export const App: React.FC = () => {
             currentUser={currentUser}
             setCurrentUser={setCurrentUser}
             setScreenState={setScreenState}
+            setInteractState={setInteractState}
           />
           <main>
             <div className={classes.container}>
@@ -363,6 +339,8 @@ export const App: React.FC = () => {
                   currentUser={currentUser}
                   screenState={screenState}
                   setScreenState={setScreenState}
+                  userIngredients={userIngredients}
+                  setUserIngredients={setUserIngredients}
                 />
               </Container>
             </div>
@@ -371,6 +349,7 @@ export const App: React.FC = () => {
             setScreenState={setScreenState}
             setFilteredDrinks={setFilteredDrinks}
             allDrinks={allDrinks}
+            setInteractState={setInteractState}
           />
         </ThemeProvider>
       </>

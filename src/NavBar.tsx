@@ -24,6 +24,7 @@ type NavBarProps = {
   currentUser: any;
   setCurrentUser: any;
   setScreenState?: any;
+  setInteractState: any;
 };
 
 export const NavBar: React.FC<NavBarProps> = ({
@@ -32,6 +33,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   currentUser,
   setCurrentUser,
   setScreenState,
+  setInteractState,
 }) => {
   const classes = useStyles();
 
@@ -87,6 +89,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           <Grid item>
             <Button
               onClick={() => {
+                setInteractState("");
                 setScreenState("Find My Drink");
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 setFilteredDrinks(allDrinks);
