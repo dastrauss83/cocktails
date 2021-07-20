@@ -15,6 +15,12 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { Delete } from "@material-ui/icons";
 import { useStyles } from "./useStyles";
+import {
+  DragDropContext,
+  Droppable,
+  DropResult,
+  Draggable,
+} from "react-beautiful-dnd";
 
 type MyIngredientsProps = {
   allIngredients: string[];
@@ -100,6 +106,19 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     }
   };
 
+  const handleOnDragEnd = async (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+    const items = Array.from(userIngredients);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    await firebaseUser.update({
+      myIngredients: items,
+    });
+    setUserIngredients(items);
+  };
+
   return (
     <Grid
       container
@@ -164,35 +183,78 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
           />
         </Grid>
       ) : null}
-      <Container className={classes.cardGrid} maxWidth="md">
-        {filteredUserIngredients.map((ingredient) => {
-          return (
-            <Grid item>
-              <Card className={`${classes.card} card`}>
-                <CardContent className={classes.cardContent}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
+      <Grid item>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <Droppable droppableId="userIngredients">
+            {(droppableProvided: any) => (
+              <ul
+                className="userIngredients"
+                {...droppableProvided.droppableProps}
+                ref={droppableProvided.innerRef}
+              >
+                <Container className={classes.cardGrid}>
+                  <Grid
+                    container
+                    spacing={1}
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
                   >
-                    <Typography variant="h5">{ingredient}</Typography>
-                    <Button
-                      onClick={(e) => {
-                        // e.stopPropagation();
-                        handleDelete(ingredient);
-                      }}
-                    >
-                      <Delete color="secondary" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Container>
+                    {filteredUserIngredients.map(
+                      (ingredient: string, index: number) => (
+                        <Draggable
+                          key={ingredient}
+                          draggableId={ingredient}
+                          index={index}
+                        >
+                          {(draggableProvided: any) => {
+                            return (
+                              <Grid item xs={10}>
+                                <li
+                                  ref={draggableProvided.innerRef}
+                                  {...draggableProvided.draggableProps}
+                                  {...draggableProvided.dragHandleProps}
+                                >
+                                  <Card className={`${classes.card} card`}>
+                                    <CardContent
+                                      className={classes.cardContent}
+                                    >
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                          alignItems: "center",
+                                        }}
+                                      >
+                                        <Typography variant="h5">
+                                          {ingredient}
+                                        </Typography>
+                                        <Button
+                                          onClick={() => {
+                                            // e.stopPropagation();
+                                            handleDelete(ingredient);
+                                          }}
+                                        >
+                                          <Delete color="secondary" />
+                                        </Button>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                </li>
+                              </Grid>
+                            );
+                          }}
+                        </Draggable>
+                      )
+                    )}
+                    {droppableProvided.placeholder}
+                  </Grid>
+                </Container>
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </Grid>
     </Grid>
   );
 };
