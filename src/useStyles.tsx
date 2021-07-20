@@ -31,7 +31,6 @@ export const useStyles = makeStyles((theme) => ({
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    hover: "cursorPointer",
   },
 
   cardMedia: {
@@ -39,6 +38,8 @@ export const useStyles = makeStyles((theme) => ({
   },
   cardContent: {
     flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   footer: {
     padding: "50px 0",

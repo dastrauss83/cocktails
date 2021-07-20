@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import firebase from "firebase";
-import { Checkbox, Grid, TextField } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  CardContent,
+  Checkbox,
+  Container,
+  Grid,
+  TextField,
+  Typography,
+} from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import { Delete } from "@material-ui/icons";
+import { useStyles } from "./useStyles";
 
 type MyIngredientsProps = {
   allIngredients: string[];
@@ -22,6 +33,18 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
   userIngredients,
   setUserIngredients,
 }) => {
+  const classes = useStyles();
+
+  const [filteredUserIngredients, setFilteredUserIngredients] = useState<
+    string[]
+  >([]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    () => setFilteredUserIngredients(userIngredients),
+    [userIngredients, setUserIngredients]
+  );
+
   let firebaseUser: any;
   if (currentUser) {
     firebaseUser = firebase
@@ -52,6 +75,31 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     setUserIngredients(data.myIngredients);
   };
 
+  const handleDelete = async (ingredient: string) => {
+    let userData = await getCurrentUserData();
+    const index = userData.myIngredients.indexOf(ingredient);
+    const tempMyIngredients = [...userData.myIngredients];
+    tempMyIngredients.splice(index, 1);
+    await firebaseUser.update({
+      myIngredients: tempMyIngredients,
+    });
+    const response = await firebaseUser.get();
+    const data = response.data();
+    setUserIngredients(data.myIngredients);
+  };
+
+  const handleSearch = (event: any, newValue: string | string[]) => {
+    if (newValue.length === 0) {
+      setFilteredUserIngredients(userIngredients);
+      return;
+    }
+    if (Array.isArray(newValue)) {
+      setFilteredUserIngredients(newValue);
+    } else {
+      setFilteredUserIngredients([newValue]);
+    }
+  };
+
   return (
     <Grid
       container
@@ -64,7 +112,6 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
       <Grid item>
         <Autocomplete
           multiple
-          disableCloseOnSelect
           value={userIngredients}
           onChange={handleIngredient}
           id="ingredientList"
@@ -87,6 +134,65 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
           )}
         />
       </Grid>
+      {userIngredients.length > 0 ? (
+        <Grid item>
+          <Autocomplete
+            multiple
+            id="userIngredients"
+            onChange={handleSearch}
+            options={userIngredients}
+            getOptionLabel={(option: string) => option}
+            style={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search My Ingredients"
+                variant="outlined"
+              />
+            )}
+            renderOption={(option, { selected }) => (
+              <React.Fragment>
+                <Checkbox
+                  icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                  checkedIcon={<CheckBoxIcon fontSize="small" />}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {option}
+              </React.Fragment>
+            )}
+          />
+        </Grid>
+      ) : null}
+      <Container className={classes.cardGrid} maxWidth="md">
+        {filteredUserIngredients.map((ingredient) => {
+          return (
+            <Grid item>
+              <Card className={`${classes.card} card`}>
+                <CardContent className={classes.cardContent}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="h5">{ingredient}</Typography>
+                    <Button
+                      onClick={(e) => {
+                        // e.stopPropagation();
+                        handleDelete(ingredient);
+                      }}
+                    >
+                      <Delete color="secondary" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Container>
     </Grid>
   );
 };

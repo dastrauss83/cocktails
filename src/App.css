@@ -1,3 +1,7 @@
 .card:hover {
   cursor: pointer;
 }
+
+.card {
+  margin-bottom: 20px;
+}
