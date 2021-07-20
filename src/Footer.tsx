@@ -6,11 +6,13 @@ import { drink } from "./App";
 type FooterProps = {
   setFilteredDrinks?: any;
   allDrinks?: drink[];
+  setScreenState?: any;
 };
 
 export const Footer: React.FC<FooterProps> = ({
   setFilteredDrinks,
   allDrinks,
+  setScreenState,
 }) => {
   const classes = useStyles();
 
@@ -25,6 +27,7 @@ export const Footer: React.FC<FooterProps> = ({
         <Grid item>
           <Button
             onClick={() => {
+              setScreenState("Find My Drink");
               window.scrollTo({ top: 0, behavior: "smooth" });
               setFilteredDrinks(allDrinks);
             }}
@@ -32,7 +35,7 @@ export const Footer: React.FC<FooterProps> = ({
           >
             <LocalBar className={classes.icon} color="secondary" />
             <Typography variant="h6" color="textPrimary">
-              Find Your Drink
+              Find My Drink
             </Typography>
           </Button>
         </Grid>

@@ -4,7 +4,7 @@ import { blue } from "@material-ui/core/colors";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: blue[600],
+      main: blue[700],
     },
     secondary: {
       main: blue[900],
@@ -31,7 +31,9 @@ export const useStyles = makeStyles((theme) => ({
     height: "100%",
     display: "flex",
     flexDirection: "column",
+    hover: "cursorPointer",
   },
+
   cardMedia: {
     paddingTop: "56.25%",
   },
@@ -45,10 +47,6 @@ export const useStyles = makeStyles((theme) => ({
     listStyleType: "circle",
     padding: "10px",
     paddingLeft: "20px",
-  },
-  cardButtons: {
-    display: "flex",
-    justifyContent: "space-between",
   },
   navBar: {
     color: "white",

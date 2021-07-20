@@ -35,10 +35,14 @@ export type ingredientDrinkMap = {
   [key: string]: drink[];
 };
 
+type screenState = "Find My Drink" | "My Favorites" | "My Ingredients";
+
 export const App: React.FC = () => {
   const classes = useStyles();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
+
+  const [screenState, setScreenState] = useState<screenState>("Find My Drink");
 
   const [allDrinks, setAllDrinks] = useState<drink[]>();
   const [filteredDrinks, setFilteredDrinks] = useState<drink[]>();
@@ -139,119 +143,222 @@ export const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allDrinks, setAllDrinks]);
 
-  if (!(allDrinks && allIngredients)) {
+  if (screenState === "Find My Drink") {
+    if (!(allDrinks && allIngredients)) {
+      return (
+        <>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
+            <main>
+              <Container maxWidth="md" className={classes.container}>
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  Find My Drink
+                </Typography>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="textSecondary"
+                  paragraph
+                >
+                  Below is a list of cocktails and their ingredients. You can
+                  search the list for a specific cocktail, or use the ingredient
+                  searches for a more refined search. The "Drinks With..."
+                  search will tell you all the cocktails that include your
+                  selected ingredits, while the "My Ingredients" search will
+                  show you only the cocktails you can make with the ingredients
+                  you have. Click on a cocktail to see any further instructions
+                  or "Favorite" to add to My Favorites.
+                </Typography>
+                <Typography
+                  style={{ fontStyle: "italic" }}
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  Loading Drinks
+                </Typography>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <CircularProgress color="secondary" />
+                </div>
+              </Container>
+            </main>
+            <Footer />
+          </ThemeProvider>
+        </>
+      );
+    }
+
     return (
       <>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
+          <NavBar
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+            currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
+            setScreenState={setScreenState}
+          />
           <main>
-            <Container maxWidth="md" className={classes.container}>
-              <Typography
-                variant="h2"
-                align="center"
-                color="textPrimary"
-                gutterBottom
-              >
-                Find Your Drink
-              </Typography>
-              <Typography
-                variant="h5"
-                align="center"
-                color="textSecondary"
-                paragraph
-              >
-                Below is a list of cocktails and their ingredients. You can
-                search the list for a specific cocktail, or use the ingredient
-                searches for a more refined search. The "Drinks With..." search
-                will tell you all the cocktails that include your selected
-                ingredits, while the "My Ingredients" search will show you only
-                the cocktails you can make with the ingredients you have. Click
-                "View" on a cocktail to see any further instructions or
-                "Favorite" to add to the list of your favorite cocktails.
-              </Typography>
-              <Typography
-                style={{ fontStyle: "italic" }}
-                variant="h2"
-                align="center"
-                color="textPrimary"
-                gutterBottom
-              >
-                Loading Drinks
-              </Typography>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress color="secondary" />
-              </div>
+            <div className={classes.container}>
+              <Container maxWidth="md">
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  Find My Drink
+                </Typography>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="textSecondary"
+                  paragraph
+                >
+                  Below is a list of cocktails and their ingredients. You can
+                  search the list for a specific cocktail, or use the ingredient
+                  searches for a more refined search. The "Drinks With..."
+                  search will tell you all the cocktails that include your
+                  selected ingredits, while the "My Ingredients" search will
+                  show you only the cocktails you can make with the ingredients
+                  you have. Click on a cocktail to see any further instructions
+                  or "Favorite" to add to My Favorites.
+                </Typography>
+                <IngredientInteract
+                  allDrinks={allDrinks}
+                  allIngredients={allIngredients}
+                  setFilteredDrinks={setFilteredDrinks}
+                  ingredientDrinkMap={ingredientDrinkMap}
+                  currentUser={currentUser}
+                />
+              </Container>
+            </div>
+            <Container className={classes.cardGrid} maxWidth="md">
+              <Grid container spacing={4}>
+                {filteredDrinks
+                  ? filteredDrinks.map((drink: drink) => (
+                      <DrinkCard
+                        key={drink.idDrink}
+                        drink={drink}
+                        currentUser={currentUser}
+                        setCurrentUser={setCurrentUser}
+                      />
+                    ))
+                  : null}
+              </Grid>
             </Container>
           </main>
-          <Footer />
+          <Footer
+            setScreenState={setScreenState}
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+          />
         </ThemeProvider>
       </>
     );
   }
-
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <NavBar
-          setFilteredDrinks={setFilteredDrinks}
-          allDrinks={allDrinks}
-          currentUser={currentUser}
-          setCurrentUser={setCurrentUser}
-        />
-        <main>
-          <div className={classes.container}>
-            <Container maxWidth="md">
-              <Typography
-                variant="h2"
-                align="center"
-                color="textPrimary"
-                gutterBottom
-              >
-                Find Your Drink
-              </Typography>
-              <Typography
-                variant="h5"
-                align="center"
-                color="textSecondary"
-                paragraph
-              >
-                Below is a list of cocktails and their ingredients. You can
-                search the list for a specific cocktail, or use the ingredient
-                searches for a more refined search. The "Drinks With..." search
-                will tell you all the cocktails that include your selected
-                ingredits, while the "My Ingredients" search will show you only
-                the cocktails you can make with the ingredients you have. Click
-                "View" on a cocktail to see any further instructions or
-                "Favorite" to add to the list of your favorite cocktails.
-              </Typography>
-              <IngredientInteract
-                allDrinks={allDrinks}
-                allIngredients={allIngredients}
-                setFilteredDrinks={setFilteredDrinks}
-                ingredientDrinkMap={ingredientDrinkMap}
-                currentUser={currentUser}
-              />
+  if (screenState === "My Favorites") {
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <NavBar
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+            currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
+            setScreenState={setScreenState}
+          />
+          <main>
+            <div className={classes.container}>
+              <Container maxWidth="md">
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  My Favorites
+                </Typography>
+              </Container>
+            </div>
+            <Container className={classes.cardGrid} maxWidth="md">
+              <Grid container spacing={4}>
+                {filteredDrinks
+                  ? filteredDrinks.map((drink: drink) => (
+                      <DrinkCard
+                        key={drink.idDrink}
+                        drink={drink}
+                        currentUser={currentUser}
+                        setCurrentUser={setCurrentUser}
+                      />
+                    ))
+                  : null}
+              </Grid>
             </Container>
-          </div>
-          <Container className={classes.cardGrid} maxWidth="md">
-            <Grid container spacing={4}>
-              {filteredDrinks
-                ? filteredDrinks.map((drink: drink) => (
-                    <DrinkCard
-                      key={drink.idDrink}
-                      drink={drink}
-                      currentUser={currentUser}
-                      setCurrentUser={setCurrentUser}
-                    />
-                  ))
-                : null}
-            </Grid>
-          </Container>
-        </main>
-        <Footer setFilteredDrinks={setFilteredDrinks} allDrinks={allDrinks} />
-      </ThemeProvider>
-    </>
-  );
+          </main>
+          <Footer
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+            setScreenState={setScreenState}
+          />
+        </ThemeProvider>
+      </>
+    );
+  }
+  if (screenState === "My Ingredients") {
+    return (
+      <>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <NavBar
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+            currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
+            setScreenState={setScreenState}
+          />
+          <main>
+            <div className={classes.container}>
+              <Container maxWidth="md">
+                <Typography
+                  variant="h2"
+                  align="center"
+                  color="textPrimary"
+                  gutterBottom
+                >
+                  My Ingredients
+                </Typography>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  color="textSecondary"
+                  paragraph
+                >
+                  Use the below to save your ingredients for future use. The My
+                  Ingredients list can be added to and deleted from at any time.
+                  My Ingredients can also be imported to the Find My Drink
+                  screen for easy use.
+                </Typography>
+              </Container>
+            </div>
+          </main>
+          <Footer
+            setScreenState={setScreenState}
+            setFilteredDrinks={setFilteredDrinks}
+            allDrinks={allDrinks}
+          />
+        </ThemeProvider>
+      </>
+    );
+  }
+  return null;
 };

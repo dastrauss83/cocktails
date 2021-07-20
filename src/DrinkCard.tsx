@@ -1,7 +1,6 @@
 import {
   Typography,
   Card,
-  CardActions,
   CardContent,
   CardMedia,
   Grid,
@@ -118,90 +117,87 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
 
   return (
     <Grid item xs={12} sm={6} md={4}>
-      <Card className={classes.card}>
+      <Card
+        className={`${classes.card} card`}
+        onClick={() => setIsInView(!isInView)}
+      >
         <CardMedia className={classes.cardMedia} image={drink.strDrinkThumb} />
         <CardContent className={classes.cardContent}>
-          <Typography gutterBottom variant="h5">
-            {drink.strDrink}
-          </Typography>
-          {/* <Typography>{drink.strInstructions}</Typography> */}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography gutterBottom variant="h5">
+              {drink.strDrink}
+            </Typography>
+            {!currentUser ? null : isFavorite ? (
+              <Button
+                color="secondary"
+                variant="contained"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFavorite();
+                  setIsFavorite(!isFavorite);
+                }}
+              >
+                Favorite
+              </Button>
+            ) : (
+              <Button
+                color="secondary"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFavorite();
+                  setIsFavorite(!isFavorite);
+                }}
+              >
+                Favorite
+              </Button>
+            )}
+          </div>
           <ul className={classes.ingredientList}>
             {ingredientList.map((ingredient, index) => (
               <li key={index}>{ingredient}</li>
             ))}
           </ul>
         </CardContent>
-        <CardActions className={classes.cardButtons}>
-          <Button
-            color="secondary"
-            size="small"
-            onClick={() => setIsInView(true)}
-          >
-            View
-          </Button>
-          <Popover
-            open={isInView}
-            anchorReference="none"
-            onClose={() => setIsInView(!isInView)}
-            transformOrigin={{
-              horizontal: "center",
-              vertical: "center",
-            }}
-            elevation={20}
-            PaperProps={{ style: { width: "50%" } }}
-            classes={{
-              root: classes.popover,
-            }}
-          >
-            <Card className={classes.card}>
-              <CardMedia
-                className={classes.cardMedia}
-                image={drink.strDrinkThumb}
-              />
-              <CardContent className={classes.cardContent}>
-                <Typography gutterBottom variant="h2">
-                  {drink.strDrink}
-                </Typography>
-                <Typography gutterBottom variant="h5">
-                  {drink.strInstructions}
-                </Typography>
-                <ul className={classes.ingredientList}>
-                  {ingredientList.map((ingredient, index) => (
-                    <li key={index}>
-                      <Typography gutterBottom variant="h5">
-                        {ingredient}
-                      </Typography>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </Popover>
-          {!currentUser ? null : isFavorite ? (
-            <Button
-              color="secondary"
-              variant="contained"
-              size="small"
-              onClick={() => {
-                handleFavorite();
-                setIsFavorite(!isFavorite);
-              }}
-            >
-              Favorite
-            </Button>
-          ) : (
-            <Button
-              color="secondary"
-              size="small"
-              onClick={() => {
-                handleFavorite();
-                setIsFavorite(!isFavorite);
-              }}
-            >
-              Favorite
-            </Button>
-          )}
-        </CardActions>
+        <Popover
+          open={isInView}
+          anchorReference="none"
+          onClose={() => setIsInView(!isInView)}
+          transformOrigin={{
+            horizontal: "center",
+            vertical: "center",
+          }}
+          elevation={20}
+          PaperProps={{ style: { width: "50%" } }}
+          classes={{
+            root: classes.popover,
+          }}
+        >
+          <Card className={classes.card}>
+            <CardMedia
+              className={classes.cardMedia}
+              image={drink.strDrinkThumb}
+            />
+            <CardContent className={classes.cardContent}>
+              <Typography gutterBottom variant="h2">
+                {drink.strDrink}
+              </Typography>
+              <Typography gutterBottom variant="h5">
+                {drink.strInstructions}
+              </Typography>
+              <ul className={classes.ingredientList}>
+                {ingredientList.map((ingredient, index) => (
+                  <li key={index}>
+                    <Typography gutterBottom variant="h5">
+                      {ingredient}
+                    </Typography>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </Popover>
       </Card>
     </Grid>
   );

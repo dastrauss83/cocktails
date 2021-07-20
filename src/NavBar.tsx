@@ -18,6 +18,7 @@ type NavBarProps = {
   allDrinks?: drink[];
   currentUser: any;
   setCurrentUser: any;
+  setScreenState?: any;
 };
 
 export const NavBar: React.FC<NavBarProps> = ({
@@ -25,6 +26,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   allDrinks,
   currentUser,
   setCurrentUser,
+  setScreenState,
 }) => {
   const classes = useStyles();
 
@@ -67,9 +69,10 @@ export const NavBar: React.FC<NavBarProps> = ({
     }
   };
 
-  const handleFavoritesScreen = async () => {
+  const handleMyFavoritesScreen = async () => {
     const userData = await getCurrentUserData();
     setFilteredDrinks(userData.favoriteDrinks);
+    setScreenState("My Favorites");
   };
 
   return (
@@ -79,13 +82,14 @@ export const NavBar: React.FC<NavBarProps> = ({
           <Grid item>
             <Button
               onClick={() => {
+                setScreenState("Find My Drink");
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 setFilteredDrinks(allDrinks);
               }}
             >
               <LocalBar className={`${classes.icon} ${classes.navBar}`} />
               <Typography variant="h6" className={classes.navBar}>
-                Find Your Drink
+                Find My Drink
               </Typography>
             </Button>
           </Grid>
@@ -120,10 +124,12 @@ export const NavBar: React.FC<NavBarProps> = ({
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
                 >
-                  <MenuItem onClick={handleFavoritesScreen}>
+                  <MenuItem onClick={handleMyFavoritesScreen}>
                     My Favorites
                   </MenuItem>
-                  {/* <MenuItem onClick={handleCloseMenu}>My Ingredients</MenuItem> */}
+                  <MenuItem onClick={() => setScreenState("My Ingredients")}>
+                    My Ingredients
+                  </MenuItem>
                   <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
               </>
