@@ -2,18 +2,17 @@ import { useStyles } from "./useStyles";
 import { Button, Grid, Typography } from "@material-ui/core";
 import { LocalBar } from "@material-ui/icons";
 import { drink } from "./App";
+import { Link } from "react-router-dom";
 
 type FooterProps = {
   setFilteredDrinks?: any;
   allDrinks?: drink[];
-  setScreenState?: any;
   setInteractState: any;
 };
 
 export const Footer: React.FC<FooterProps> = ({
   setFilteredDrinks,
   allDrinks,
-  setScreenState,
   setInteractState,
 }) => {
   const classes = useStyles();
@@ -30,16 +29,17 @@ export const Footer: React.FC<FooterProps> = ({
           <Button
             onClick={() => {
               setInteractState("");
-              setScreenState("Find My Drink");
               window.scrollTo({ top: 0, behavior: "smooth" });
               setFilteredDrinks(allDrinks);
             }}
             style={{ paddingLeft: "0px" }}
           >
-            <LocalBar className={classes.icon} color="secondary" />
-            <Typography variant="h6" color="textPrimary">
-              Find My Drink
-            </Typography>
+            <Link to="/" className={classes.link}>
+              <LocalBar className={classes.icon} color="secondary" />
+              <Typography variant="h6" color="textPrimary">
+                Find My Drink
+              </Typography>
+            </Link>
           </Button>
         </Grid>
         <Grid item>
@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({
             color="textSecondary"
             gutterBottom
           >
-            Created by:{" "}
+            Created by:{"  "}
             <span style={{ fontStyle: "italic" }}>David Strauss</span>
           </Typography>
         </Grid>

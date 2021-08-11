@@ -25,8 +25,6 @@ import {
 type MyIngredientsProps = {
   allIngredients: string[];
   currentUser: any;
-  screenState: string;
-  setScreenState: any;
   userIngredients: string[];
   setUserIngredients: any;
 };
@@ -34,8 +32,6 @@ type MyIngredientsProps = {
 export const MyIngredients: React.FC<MyIngredientsProps> = ({
   allIngredients,
   currentUser,
-  screenState,
-  setScreenState,
   userIngredients,
   setUserIngredients,
 }) => {
@@ -45,10 +41,9 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     string[]
   >([]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(
     () => setFilteredUserIngredients(userIngredients),
-    [userIngredients, setUserIngredients]
+    [userIngredients]
   );
 
   let firebaseUser: any;
@@ -101,9 +96,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
     }
     if (Array.isArray(newValue)) {
       setFilteredUserIngredients(newValue);
-    } else {
-      setFilteredUserIngredients([newValue]);
-    }
+    } else setFilteredUserIngredients([newValue]);
   };
 
   const handleOnDragEnd = async (result: DropResult) => {
@@ -137,7 +130,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
           options={allIngredients}
           getOptionLabel={(option) => JSON.stringify(option)}
           renderOption={(option, { selected }) => (
-            <React.Fragment>
+            <>
               <Checkbox
                 icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                 checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -145,7 +138,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
                 checked={selected}
               />
               {option}
-            </React.Fragment>
+            </>
           )}
           style={{ width: 300 }}
           renderInput={(params) => (
@@ -153,7 +146,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
           )}
         />
       </Grid>
-      {userIngredients.length > 0 ? (
+      {userIngredients.length > 0 && (
         <Grid item>
           <Autocomplete
             multiple
@@ -170,7 +163,7 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
               />
             )}
             renderOption={(option, { selected }) => (
-              <React.Fragment>
+              <>
                 <Checkbox
                   icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                   checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -178,11 +171,11 @@ export const MyIngredients: React.FC<MyIngredientsProps> = ({
                   checked={selected}
                 />
                 {option}
-              </React.Fragment>
+              </>
             )}
           />
         </Grid>
-      ) : null}
+      )}
       <Grid item>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="userIngredients">

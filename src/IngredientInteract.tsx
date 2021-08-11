@@ -15,7 +15,12 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { useEffect, useState } from "react";
 import { useStyles } from "./useStyles";
 import React from "react";
-import { drink, ingredientDrinkMap, interactState } from "./App";
+import {
+  drink,
+  ingredientDrinkMap,
+  interactState,
+  capitalizeHelper,
+} from "./App";
 
 type IngredientInteractProps = {
   allDrinks: drink[];
@@ -50,12 +55,10 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
     }
     if (Array.isArray(newValue)) {
       setFilteredDrinks(newValue);
-    } else {
-      setFilteredDrinks([newValue]);
-    }
+    } else setFilteredDrinks([newValue]);
   };
 
-  const handleDrinksWith = (event: any, newValue: string | string[]) => {
+  const handleDrinksWith = (_event: any, newValue: string | string[]) => {
     if (newValue.length === 0) {
       setFilteredDrinks(allDrinks);
       return;
@@ -65,7 +68,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
     }
     let arrayOfDrinks: drink[] = [];
     for (let i = 0; i < newValue.length; i++) {
-      arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
+      arrayOfDrinks.push(...ingredientDrinkMap[newValue[i]]);
     }
     setFilteredDrinks(arrayOfDrinks);
   };
@@ -85,11 +88,9 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
       if (!myIngredientsState) {
         //not strict
         for (let i = 0; i < newValue.length; i++) {
-          arrayOfDrinks = arrayOfDrinks.concat(ingredientDrinkMap[newValue[i]]);
+          arrayOfDrinks.push(...ingredientDrinkMap[newValue[i]]);
         }
-        if (newValue.length === 1) {
-          setFilteredDrinks(newValue);
-        } else {
+        if (newValue.length !== 1) {
           arrayOfDrinks = arrayOfDrinks.filter(
             (drink: drink, index: number, array: drink[]) =>
               array.indexOf(drink) === index &&
@@ -100,24 +101,16 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
       } else {
         //strict
         for (let i = 0; i < allDrinks.length; i++) {
-          for (let j = 1; j < 15; j++) {
-            if (allDrinks[i][`strIngredient${j}`]) {
+          for (let ii = 1; ii < 15; ii++) {
+            if (allDrinks[i][`strIngredient${ii}`]) {
               if (
                 newValue.indexOf(
-                  allDrinks[i][`strIngredient${j}`]
-                    .toLowerCase()
-                    .split(" ")
-                    .map(
-                      (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                    )
-                    .join(" ")
+                  capitalizeHelper(allDrinks[i][`strIngredient${ii}`])
                 ) === -1
               ) {
                 break;
               }
-            } else {
-              arrayOfDrinks = arrayOfDrinks.concat(allDrinks[i]);
-            }
+            } else arrayOfDrinks.push(allDrinks[i]);
           }
         }
         arrayOfDrinks = arrayOfDrinks.filter((drink: drink, index: number) => {
@@ -131,7 +124,13 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
   useEffect(() => {
     handleMyIngredients(Event, myIngredientsValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myIngredientsState, setMyIngredientsState]);
+  }, [myIngredientsState]);
+
+  const toggleInteractState = (state: interactState) => {
+    if (interactState === state) {
+      setInteractState("");
+    } else setInteractState(state);
+  };
 
   return (
     <div className={classes.buttons}>
@@ -150,11 +149,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               color="secondary"
               onClick={() => {
                 setFilteredDrinks(allDrinks);
-                if (interactState === "search") {
-                  setInteractState("");
-                } else {
-                  setInteractState("search");
-                }
+                toggleInteractState("search");
               }}
             >
               <Search className={classes.icon} />
@@ -167,11 +162,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               color="secondary"
               onClick={() => {
                 setFilteredDrinks(allDrinks);
-                if (interactState === "drinksWith") {
-                  setInteractState("");
-                } else {
-                  setInteractState("drinksWith");
-                }
+                toggleInteractState("drinksWith");
               }}
             >
               Drinks With...
@@ -183,11 +174,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
               color="secondary"
               onClick={() => {
                 setFilteredDrinks(allDrinks);
-                if (interactState === "myIngredients") {
-                  setInteractState("");
-                } else {
-                  setInteractState("myIngredients");
-                }
+                toggleInteractState("myIngredients");
               }}
             >
               My Ingredients
@@ -195,7 +182,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
           </ButtonGroup>
         </Grid>
         <Grid item>
-          {interactState === "search" ? (
+          {interactState === "search" && (
             <Autocomplete
               multiple
               id="cocktailList"
@@ -207,7 +194,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                 <TextField {...params} label="Cocktails" variant="outlined" />
               )}
               renderOption={(option, { selected }) => (
-                <React.Fragment>
+                <>
                   <Checkbox
                     icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                     checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -215,19 +202,19 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                     checked={selected}
                   />
                   {option.strDrink}
-                </React.Fragment>
+                </>
               )}
             />
-          ) : null}
-          {interactState === "drinksWith" ? (
+          )}
+          {interactState === "drinksWith" && (
             <Autocomplete
               multiple
               id="ingredientList"
               onChange={handleDrinksWith}
               options={allIngredients}
-              getOptionLabel={(option) => JSON.stringify(option)}
+              getOptionLabel={(option) => option}
               renderOption={(option, { selected }) => (
-                <React.Fragment>
+                <>
                   <Checkbox
                     icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                     checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -235,15 +222,15 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                     checked={selected}
                   />
                   {option}
-                </React.Fragment>
+                </>
               )}
               style={{ width: 300 }}
               renderInput={(params) => (
                 <TextField {...params} label="Ingredients" variant="outlined" />
               )}
             />
-          ) : null}
-          {interactState === "myIngredients" ? (
+          )}
+          {interactState === "myIngredients" && (
             <Grid
               container
               spacing={4}
@@ -260,9 +247,9 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                   onChange={handleMyIngredients}
                   id="ingredientList"
                   options={allIngredients}
-                  getOptionLabel={(option) => JSON.stringify(option)}
+                  getOptionLabel={(option) => option}
                   renderOption={(option, { selected }) => (
-                    <React.Fragment>
+                    <>
                       <Checkbox
                         icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                         checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -270,7 +257,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                         checked={selected}
                       />
                       {option}
-                    </React.Fragment>
+                    </>
                   )}
                   style={{ width: 300 }}
                   renderInput={(params) => (
@@ -282,7 +269,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                   )}
                 />
               </Grid>
-              {currentUser ? (
+              {currentUser && (
                 <Grid item>
                   <Button
                     variant="outlined"
@@ -290,13 +277,12 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                     onClick={(e) => {
                       setMyIngredientsValue(userIngredients);
                       handleMyIngredients(e, userIngredients);
-                      console.log(userIngredients);
                     }}
                   >
                     Import My Ingredients
                   </Button>
                 </Grid>
-              ) : null}
+              )}
               <Grid item>
                 <FormGroup>
                   <FormControlLabel
@@ -316,7 +302,7 @@ export const IngredientInteract: React.FC<IngredientInteractProps> = ({
                 </FormGroup>
               </Grid>
             </Grid>
-          ) : null}
+          )}
         </Grid>
       </Grid>
     </div>

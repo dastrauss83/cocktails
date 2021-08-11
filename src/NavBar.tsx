@@ -17,13 +17,13 @@ import { useStyles } from "./useStyles";
 import firebase from "firebase";
 import { useState } from "react";
 import { drink } from "./App";
+import { Link } from "react-router-dom";
 
 type NavBarProps = {
   setFilteredDrinks?: any;
   allDrinks?: drink[];
   currentUser: any;
   setCurrentUser: any;
-  setScreenState?: any;
   setInteractState: any;
 };
 
@@ -32,7 +32,6 @@ export const NavBar: React.FC<NavBarProps> = ({
   allDrinks,
   currentUser,
   setCurrentUser,
-  setScreenState,
   setInteractState,
 }) => {
   const classes = useStyles();
@@ -70,16 +69,9 @@ export const NavBar: React.FC<NavBarProps> = ({
       });
   };
 
-  const handleLogout = (): void => {
-    if (window.confirm("Are you sure you want to Sign Out?")) {
-      setCurrentUser();
-    }
-  };
-
   const handleMyFavoritesScreen = async () => {
     const userData = await getCurrentUserData();
     setFilteredDrinks(userData.favoriteDrinks);
-    setScreenState("My Favorites");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -91,15 +83,16 @@ export const NavBar: React.FC<NavBarProps> = ({
             <Button
               onClick={() => {
                 setInteractState("");
-                setScreenState("Find My Drink");
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 setFilteredDrinks(allDrinks);
               }}
             >
-              <LocalBar className={`${classes.icon} ${classes.navBar}`} />
-              <Typography variant="h6" className={classes.navBar}>
-                Find My Drink
-              </Typography>
+              <Link to="/" className={classes.link}>
+                <LocalBar className={`${classes.icon} ${classes.navBar}`} />
+                <Typography variant="h6" className={classes.navBar}>
+                  Find My Drink
+                </Typography>
+              </Link>
             </Button>
           </Grid>
           {!currentUser ? (
@@ -117,27 +110,30 @@ export const NavBar: React.FC<NavBarProps> = ({
             <>
               <Grid item>
                 <Button onClick={handleMyFavoritesScreen}>
-                  <FavoriteBorder
-                    className={`${classes.icon} ${classes.navBar}`}
-                  />
-                  <Typography variant="h6" className={classes.navBar}>
-                    My Favorites
-                  </Typography>
+                  <Link to="/my-favorites" className={classes.link}>
+                    <FavoriteBorder
+                      className={`${classes.icon} ${classes.navBar}`}
+                    />
+                    <Typography variant="h6" className={classes.navBar}>
+                      My Favorites
+                    </Typography>
+                  </Link>
                 </Button>
               </Grid>
               <Grid item>
                 <Button
                   onClick={() => {
-                    setScreenState("My Ingredients");
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 >
-                  <Typography variant="h6" className={classes.navBar}>
-                    My Ingredients
-                  </Typography>
-                  <InvertColors
-                    className={`${classes.icon} ${classes.navBar}`}
-                  />
+                  <Link to="/my-ingredients" className={classes.link}>
+                    <Typography variant="h6" className={classes.navBar}>
+                      My Ingredients
+                    </Typography>
+                    <InvertColors
+                      className={`${classes.icon} ${classes.navBar}`}
+                    />
+                  </Link>
                 </Button>
               </Grid>
               <Grid item>
@@ -161,7 +157,11 @@ export const NavBar: React.FC<NavBarProps> = ({
                   onClose={handleCloseMenu}
                   className={classes.menu}
                 >
-                  <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                  <MenuItem onClick={() => setCurrentUser()}>
+                    <Link to="/" className={classes.link}>
+                      Sign Out
+                    </Link>
+                  </MenuItem>
                 </Menu>
               </Grid>
             </>

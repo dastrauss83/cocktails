@@ -17,14 +17,9 @@ import { useStyles } from "./useStyles";
 type DrinkCardProps = {
   drink: drink;
   currentUser: any;
-  setCurrentUser: any;
 };
 
-export const DrinkCard: React.FC<DrinkCardProps> = ({
-  drink,
-  currentUser,
-  setCurrentUser,
-}) => {
+export const DrinkCard: React.FC<DrinkCardProps> = ({ drink, currentUser }) => {
   const classes = useStyles();
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [isInView, setIsInView] = useState<boolean>(false);
@@ -38,9 +33,7 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
           " " +
           (drink[`strIngredient${i}`] || "")
       );
-    } else {
-      break;
-    }
+    } else break;
   }
 
   let firebaseUser: any;
@@ -67,15 +60,13 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
           (dr: drink) => dr.idDrink === drink.idDrink
         ).length > 0
       );
-    } else {
-      setIsFavorite(false);
-    }
+    } else setIsFavorite(false);
   };
 
   useEffect(() => {
     handleIsFavorite();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, setCurrentUser]);
+  }, [currentUser]);
 
   const handleNewUser = async () => {
     if (currentUser) {
@@ -92,7 +83,7 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
   useEffect(() => {
     handleNewUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, setCurrentUser]);
+  }, [currentUser]);
 
   const handleFavorite = async () => {
     const userData = await getCurrentUserData();
@@ -155,8 +146,8 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
             )}
           </div>
           <ul className={classes.ingredientList}>
-            {ingredientList.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
+            {ingredientList.map((ingredient) => (
+              <li key={ingredient}>{ingredient}</li>
             ))}
           </ul>
         </CardContent>
@@ -187,8 +178,8 @@ export const DrinkCard: React.FC<DrinkCardProps> = ({
                 {drink.strInstructions}
               </Typography>
               <ul className={classes.ingredientList}>
-                {ingredientList.map((ingredient, index) => (
-                  <li key={index}>
+                {ingredientList.map((ingredient) => (
+                  <li key={ingredient}>
                     <Typography gutterBottom variant="h5">
                       {ingredient}
                     </Typography>

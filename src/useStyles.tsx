@@ -60,4 +60,10 @@ export const useStyles = makeStyles((theme) => ({
   menu: {
     width: "500px",
   },
+  link: {
+    textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+    color: "inherit",
+  },
 }));

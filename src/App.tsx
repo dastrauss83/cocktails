@@ -3,14 +3,15 @@ import "./App.css";
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
-import { useStyles, theme } from "./useStyles";
-import { DrinkCard } from "./DrinkCard";
+import { theme } from "./useStyles";
 import { Footer } from "./Footer";
 import { NavBar } from "./NavBar";
-import { IngredientInteract } from "./IngredientInteract";
-import { MyIngredients } from "./MyIngredients";
+import { MyIngredientsPage } from "./Pages/MyIngredientsPage";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import { FindMyDrink } from "./Pages/FindMyDrink";
+import { MyFavorites } from "./Pages/MyFavorites";
 
 firebase.initializeApp({
   apiKey: "AIzaSyAZCEan1zGJg6N4RyCoI8l36kVYbm8l1F4",
@@ -31,15 +32,18 @@ export type ingredientDrinkMap = {
 
 export type interactState = "" | "search" | "drinksWith" | "myIngredients";
 
-type screenState = "Find My Drink" | "My Favorites" | "My Ingredients";
+export const capitalizeHelper = (string: string): string => {
+  return string
+    .toLowerCase()
+    .split(" ")
+    .map((s: string) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(" ");
+};
 
 export const App: React.FC = () => {
-  const classes = useStyles();
-
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userIngredients, setUserIngredients] = useState<string[]>([]);
 
-  const [screenState, setScreenState] = useState<screenState>("Find My Drink");
   const [interactState, setInteractState] = useState<interactState>("");
 
   const [allDrinks, setAllDrinks] = useState<drink[]>([]);
@@ -59,17 +63,17 @@ export const App: React.FC = () => {
 
   const getAllDrinks = async () => {
     const possibleKeys = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let listOfPromises: Promise<any>[] = [];
+    let arrayOfPromises: Promise<any>[] = [];
     for (let i = 0; i < possibleKeys.length; i++) {
-      listOfPromises = await listOfPromises.concat(
-        getOneDrinkList(possibleKeys.charAt(i))
-      );
+      arrayOfPromises.push(getOneDrinkList(possibleKeys.charAt(i)));
     }
-    const arrayOfDrinks = (await Promise.all(listOfPromises)).flat();
-    const listOfDrinks = arrayOfDrinks.filter(Boolean).sort();
+    const arrayOfDrinks = (await Promise.all(arrayOfPromises))
+      .flat()
+      .filter(Boolean)
+      .sort();
 
-    setAllDrinks(listOfDrinks);
-    setFilteredDrinks(listOfDrinks);
+    setAllDrinks(arrayOfDrinks);
+    setFilteredDrinks(arrayOfDrinks);
   };
 
   useEffect(() => {
@@ -80,53 +84,27 @@ export const App: React.FC = () => {
   const getAllIngredients = () => {
     const tempIngredientDrinkMap: ingredientDrinkMap = {};
     const ingredientList: string[] = [];
-    if (allDrinks && allDrinks.length > 430) {
-      for (let j = 0; j < allDrinks.length; j++) {
-        for (let i = 1; i < 15; i++) {
-          if (allDrinks[j][`strIngredient${i}`]) {
+    if (allDrinks && allDrinks.length > 400) {
+      for (let i = 0; i < allDrinks.length; i++) {
+        for (let ii = 1; ii < 15; ii++) {
+          if (allDrinks[i][`strIngredient${ii}`]) {
             if (
               ingredientList.indexOf(
-                allDrinks[j][`strIngredient${i}`]
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                  )
-                  .join(" ")
+                capitalizeHelper(allDrinks[i][`strIngredient${ii}`])
               ) === -1
             ) {
               tempIngredientDrinkMap[
-                allDrinks[j][`strIngredient${i}`]
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                  )
-                  .join(" ")
-              ] = [allDrinks[j]];
+                capitalizeHelper(allDrinks[i][`strIngredient${ii}`])
+              ] = [allDrinks[i]];
               ingredientList.push(
-                allDrinks[j][`strIngredient${i}`]
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                  )
-                  .join(" ")
+                capitalizeHelper(allDrinks[i][`strIngredient${ii}`])
               );
             } else {
               tempIngredientDrinkMap[
-                allDrinks[j][`strIngredient${i}`]
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (s: string) => s.charAt(0).toUpperCase() + s.substring(1)
-                  )
-                  .join(" ")
-              ].push(allDrinks[j]);
+                capitalizeHelper(allDrinks[i][`strIngredient${ii}`])
+              ].push(allDrinks[i]);
             }
-          } else {
-            break;
-          }
+          } else break;
         }
       }
     }
@@ -139,221 +117,79 @@ export const App: React.FC = () => {
   useEffect(() => {
     getAllIngredients();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allDrinks, setAllDrinks]);
-
-  let firebaseUser: any;
-  if (currentUser) {
-    firebaseUser = firebase
-      .firestore()
-      .collection("favorites")
-      .doc(currentUser.uid);
-  }
+  }, [allDrinks]);
 
   const getUserIngredients = async () => {
     if (currentUser) {
-      const response = await firebaseUser.get();
+      const response = await firebase
+        .firestore()
+        .collection("favorites")
+        .doc(currentUser.uid)
+        .get();
       const data = response.data();
-      setUserIngredients(data.myIngredients);
+      data && setUserIngredients(data.myIngredients);
     }
   };
 
   useEffect(() => {
     getUserIngredients();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenState, setScreenState, currentUser, setCurrentUser]);
+  }, [currentUser]);
 
-  if (screenState === "Find My Drink") {
-    return (
-      <>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <NavBar
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            setScreenState={setScreenState}
-            setInteractState={setInteractState}
-          />
-          <main>
-            <div className={classes.container}>
-              <Container maxWidth="md">
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  Find My Drink
-                </Typography>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="textSecondary"
-                  paragraph
-                >
-                  Below is a list of cocktails and their ingredients. You can
-                  search the list for a specific cocktail, or use the ingredient
-                  searches for a more refined search. The "Drinks With..."
-                  search will tell you all the cocktails that include your
-                  selected ingredits, while the "My Ingredients" search will
-                  show you only the cocktails you can make with the ingredients
-                  you have. Click on a cocktail to see any further instructions
-                  or "Favorite" to add to My Favorites.
-                </Typography>
-                <IngredientInteract
-                  allDrinks={allDrinks}
-                  allIngredients={allIngredients}
-                  setFilteredDrinks={setFilteredDrinks}
-                  ingredientDrinkMap={ingredientDrinkMap}
-                  currentUser={currentUser}
-                  userIngredients={userIngredients}
-                  interactState={interactState}
-                  setInteractState={setInteractState}
-                />
-              </Container>
-            </div>
-            <Container className={classes.cardGrid} maxWidth="md">
-              <Grid container spacing={4}>
-                {filteredDrinks
-                  ? filteredDrinks.map((drink: drink) => (
-                      <DrinkCard
-                        key={drink.idDrink}
-                        drink={drink}
-                        currentUser={currentUser}
-                        setCurrentUser={setCurrentUser}
-                      />
-                    ))
-                  : null}
-              </Grid>
-            </Container>
-          </main>
-          <Footer
-            setScreenState={setScreenState}
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            setInteractState={setInteractState}
-          />
-        </ThemeProvider>
-      </>
-    );
-  }
-  if (screenState === "My Favorites") {
-    return (
-      <>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <NavBar
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            setScreenState={setScreenState}
-            setInteractState={setInteractState}
-          />
-          <main>
-            <div className={classes.container}>
-              <Container maxWidth="md">
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  My Favorites
-                </Typography>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="textSecondary"
-                  paragraph
-                >
-                  Below are the cocktails that you have favorited. This list can
-                  be added to and removed from at any time. Use the Find My
-                  Drink screen to add more drinks to My Favorites.
-                </Typography>
-              </Container>
-            </div>
-            <Container className={classes.cardGrid} maxWidth="md">
-              <Grid container spacing={4}>
-                {filteredDrinks
-                  ? filteredDrinks.map((drink: drink) => (
-                      <DrinkCard
-                        key={drink.idDrink}
-                        drink={drink}
-                        currentUser={currentUser}
-                        setCurrentUser={setCurrentUser}
-                      />
-                    ))
-                  : null}
-              </Grid>
-            </Container>
-          </main>
-          <Footer
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            setScreenState={setScreenState}
-            setInteractState={setInteractState}
-          />
-        </ThemeProvider>
-      </>
-    );
-  }
-  if (screenState === "My Ingredients") {
-    return (
-      <>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <NavBar
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            setScreenState={setScreenState}
-            setInteractState={setInteractState}
-          />
-          <main>
-            <div className={classes.container}>
-              <Container maxWidth="md">
-                <Typography
-                  variant="h2"
-                  align="center"
-                  color="textPrimary"
-                  gutterBottom
-                >
-                  My Ingredients
-                </Typography>
-                <Typography
-                  variant="h5"
-                  align="center"
-                  color="textSecondary"
-                  paragraph
-                >
-                  Use the below to save your ingredients for future use. The My
-                  Ingredients list can be added to and deleted from at any time.
-                  My Ingredients can also be imported to the Find My Drink
-                  screen for easy use.
-                </Typography>
-                <MyIngredients
-                  allIngredients={allIngredients}
-                  currentUser={currentUser}
-                  screenState={screenState}
-                  setScreenState={setScreenState}
-                  userIngredients={userIngredients}
-                  setUserIngredients={setUserIngredients}
-                />
-              </Container>
-            </div>
-          </main>
-          <Footer
-            setScreenState={setScreenState}
-            setFilteredDrinks={setFilteredDrinks}
-            allDrinks={allDrinks}
-            setInteractState={setInteractState}
-          />
-        </ThemeProvider>
-      </>
-    );
-  }
-  return null;
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <NavBar
+          setFilteredDrinks={setFilteredDrinks}
+          allDrinks={allDrinks}
+          currentUser={currentUser}
+          setCurrentUser={setCurrentUser}
+          setInteractState={setInteractState}
+        />
+        <Switch>
+          <Route exact path="/">
+            <FindMyDrink
+              allDrinks={allDrinks}
+              allIngredients={allIngredients}
+              setFilteredDrinks={setFilteredDrinks}
+              ingredientDrinkMap={ingredientDrinkMap}
+              currentUser={currentUser}
+              userIngredients={userIngredients}
+              interactState={interactState}
+              setInteractState={setInteractState}
+              filteredDrinks={filteredDrinks}
+            />
+          </Route>
+          <Route exact path="/my-favorites">
+            {!currentUser ? (
+              <Redirect to="/" />
+            ) : (
+              <MyFavorites
+                currentUser={currentUser}
+                filteredDrinks={filteredDrinks}
+              />
+            )}
+          </Route>
+          <Route exact path="/my-ingredients">
+            {!currentUser ? (
+              <Redirect to="/" />
+            ) : (
+              <MyIngredientsPage
+                allIngredients={allIngredients}
+                currentUser={currentUser}
+                userIngredients={userIngredients}
+                setUserIngredients={setUserIngredients}
+              />
+            )}
+          </Route>
+        </Switch>
+        <Footer
+          setFilteredDrinks={setFilteredDrinks}
+          allDrinks={allDrinks}
+          setInteractState={setInteractState}
+        />
+      </BrowserRouter>
+    </ThemeProvider>
+  );
 };
